@@ -11,3 +11,7 @@ El objetivo de este proyecto es la obtención y procesamiento de imágenes satel
 ### Vídeos
 
 [A Short Course on Earth Observation Methods and Data](https://www.youtube.com/watch?v=Pz-96PMm5x8)
+
+### Notebooks
+
+[Wildfires from Satellite Images](https://notebooks.gesis.org/binder/jupyter/user/sentinel-hub-education-7qynditq/notebooks/wildfires/Wildfires%20from%20Satellite%20Images.ipynb)
