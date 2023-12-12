@@ -1,1 +1,6 @@
 requests
+sentinelsat
+oauthlib
+requests_oauthlib
+python-dotenv
+colorlog
