@@ -32,3 +32,6 @@ response = requests.post(
     """,
     },
 )
+
+# Print the response to the console
+print(response.json())
