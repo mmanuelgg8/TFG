@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 configuration = Configuration()
 MBTILES_PATH: str = str(configuration["mbtiles_path"])
-GEOTIFF_PATH: str = str(configuration["geotiff_path"])
+GEOTIFFS_PATH: str = str(configuration["geotiffs_path"])
 TILES_PATH: str = str(configuration["tiles_path"])
 
 
