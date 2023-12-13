@@ -1,12 +1,15 @@
+import logging
 from oauthlib.oauth2 import BackendApplicationClient
 from requests_oauthlib import OAuth2Session
 import os
 from dotenv import load_dotenv
-from app.logger_setup import setup_logger
+from app.utils.logging import set_logging
 
 load_dotenv()
 
-logger = setup_logger(__name__)
+set_logging()
+
+logger = logging.getLogger(__name__)
 
 
 class Sentinel2Downloader:

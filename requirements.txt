@@ -4,3 +4,4 @@ oauthlib
 requests_oauthlib
 python-dotenv
 colorlog
+pyhocon
