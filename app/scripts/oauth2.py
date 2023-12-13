@@ -6,10 +6,11 @@ from app.logger_setup import setup_logger
 
 load_dotenv()
 
+logger = setup_logger(__name__)
+
 
 class Sentinel2Downloader:
     def __init__(self, client_id, client_secret):
-        self.logger = setup_logger(__name__)
         self.client_id = client_id
         self.client_secret = client_secret
 
@@ -24,7 +25,7 @@ class Sentinel2Downloader:
 
     def download(self):
         client = BackendApplicationClient(client_id=self.client_id)
-        self.logger.info("Client created")
+        logger.info("Client created")
         oauth = OAuth2Session(client=client)
         token = self.get_token()
         url = "https://sh.dataspace.copernicus.eu/api/v1/process"
@@ -53,7 +54,7 @@ class Sentinel2Downloader:
             url,
             json=payload,
         )
-        self.logger.info("Save image to file")
+        logger.info("Save image to file")
         with open("image.png", "wb") as f:
             f.write(resp.content)
 
