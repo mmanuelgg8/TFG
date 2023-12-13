@@ -9,7 +9,6 @@ from app.configuration.configuration import Configuration
 load_dotenv()
 
 set_logging()
-
 logger = logging.getLogger(__name__)
 
 configuration = Configuration()

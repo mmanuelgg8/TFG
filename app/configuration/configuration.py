@@ -14,7 +14,7 @@ class Configuration:
     CONFIG_ENV_VAR = "CONFIG_PATH"
 
     def __init__(self, config_filename=None):
-        self.config_filename = config_filename or os.getenv(self.CONFIG_ENV_VAR)
+        self.config_filename = config_filename or os.getenv(self.CONFIG_ENV_VAR, "./resources/config/application.conf")
         self.data = ConfigFactory.parse_file(self.config_filename)
 
     def __getitem__(self, item):
