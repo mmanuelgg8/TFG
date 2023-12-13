@@ -3,8 +3,8 @@ from oauthlib.oauth2 import BackendApplicationClient
 from requests_oauthlib import OAuth2Session
 import os
 from dotenv import load_dotenv
-from app.utils.logging import set_logging
-from app.configuration.configuration import Configuration
+from utils.logging import set_logging
+from configuration.configuration import Configuration
 
 load_dotenv()
 
@@ -15,6 +15,7 @@ configuration = Configuration()
 MBTILES_PATH: str = str(configuration["mbtiles_path"])
 GEOTIFFS_PATH: str = str(configuration["geotiffs_path"])
 TILES_PATH: str = str(configuration["tiles_path"])
+PNGS_PATH: str = str(configuration["pngs_path"])
 
 
 class Sentinel2Downloader:
@@ -63,12 +64,5 @@ class Sentinel2Downloader:
             json=payload,
         )
         logger.info("Save image to file")
-        with open("image.png", "wb") as f:
+        with open(PNGS_PATH + "image.png", "wb") as f:
             f.write(resp.content)
-
-
-client_id = os.getenv("COPERNICUS_CLIENT_ID")
-client_secret = os.getenv("COPERNICUS_CLIENT_SECRET")
-
-sentinel = Sentinel2Downloader(client_id, client_secret)
-sentinel.download()

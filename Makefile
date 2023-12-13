@@ -19,6 +19,9 @@ clean:
 
 # Additional targets can be added based on project needs
 
+run:
+	cd app && pwd && python -m main
+
 oauth-script:
 	python -m app.scripts.oauth2
 
