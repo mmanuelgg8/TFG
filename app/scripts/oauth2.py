@@ -4,12 +4,18 @@ from requests_oauthlib import OAuth2Session
 import os
 from dotenv import load_dotenv
 from app.utils.logging import set_logging
+from app.configuration.configuration import Configuration
 
 load_dotenv()
 
 set_logging()
 
 logger = logging.getLogger(__name__)
+
+configuration = Configuration()
+MBTILES_PATH: str = str(configuration["mbtiles_path"])
+GEOTIFF_PATH: str = str(configuration["geotiff_path"])
+TILES_PATH: str = str(configuration["tiles_path"])
 
 
 class Sentinel2Downloader:
