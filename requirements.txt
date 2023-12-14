@@ -5,3 +5,4 @@ requests_oauthlib
 python-dotenv
 colorlog
 pyhocon
+eo-learn

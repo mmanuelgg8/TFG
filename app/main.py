@@ -1,7 +1,9 @@
-import os
 import logging
+import os
+
+from scripts.downloader import UrlConstants, Downloader
 from utils import set_logging
-from scripts.oauth2 import Sentinel2Downloader
+
 from configuration.configuration import Configuration
 
 set_logging()
@@ -14,7 +16,7 @@ if __name__ == "__main__":
     configuration = Configuration()
     EVALSCRIPTS_PATH: str = str(configuration["evalscripts_path"])
 
-    sentinel = Sentinel2Downloader(client_id, client_secret)
+    sentinel = Downloader(client_id, client_secret)
     bbox = [13.822174072265625, 45.85080395917834, 14.55963134765625, 46.29191774991382]
     data = [
         {
@@ -28,5 +30,6 @@ if __name__ == "__main__":
         evalscript = f.read()
 
     print(evalscript)
+    url = UrlConstants.COPERNICUS_API_PROCESS.value
     payload = sentinel.create_payload(bbox, data, evalscript)
-    sentinel.download(payload)
+    sentinel.download(url, payload)
