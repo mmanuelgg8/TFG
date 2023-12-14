@@ -67,20 +67,20 @@ class Downloader:
         self.client_id = client_id
         self.client_secret = client_secret
 
-    def oauth(self):
-        client = BackendApplicationClient(client_id=self.client_id)
-        logger.info("Client created")
-        oauth = OAuth2Session(client_id=self.client_id, client=client)
-        logger.info("OAuth created with client id: " + self.client_id)
-        oauth.token = self.get_token(oauth)
-        return oauth
-
     def get_token(self, oauth):
         token = oauth.fetch_token(
             token_url=UrlConstants.COPERNICUS_TOKEN.value,
             client_secret=self.client_secret,
         )
         return token
+
+    def oauth(self):
+        client = BackendApplicationClient(client_id=self.client_id)
+        logger.info("Client created")
+        oauth = OAuth2Session(client_id=self.client_id, client=client)
+        oauth.token = self.get_token(oauth)
+        logger.info("OAuth created with client id: " + self.client_id)
+        return oauth
 
     def create_payload(self, bbox, data, evalscript):
         payload = {
