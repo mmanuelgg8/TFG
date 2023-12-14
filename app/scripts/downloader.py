@@ -59,20 +59,25 @@ class UrlConstants(Enum):
     SENTINEL_API_PROCESS = "https://sh.services.sentinel-hub.com/api/v1/process"
     COPERNICUS_API_PROCESS = "https://sh.dataspace.copernicus.eu/api/v1/process"
     COPERNICUS_CATALOG = "https://scihub.copernicus.eu/apihub/search"
+    COPERNICUS_TOKEN = "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token"
 
 
 class Downloader:
     def __init__(self, client_id, client_secret):
         self.client_id = client_id
         self.client_secret = client_secret
-        self.client = BackendApplicationClient(client_id=self.client_id)
-        logger.info("Client created")
 
-    def get_token(self):
+    def oauth(self):
         client = BackendApplicationClient(client_id=self.client_id)
-        oauth = OAuth2Session(client=client)
+        logger.info("Client created")
+        oauth = OAuth2Session(client_id=self.client_id, client=client)
+        logger.info("OAuth created with client id: " + self.client_id)
+        oauth.token = self.get_token(oauth)
+        return oauth
+
+    def get_token(self, oauth):
         token = oauth.fetch_token(
-            token_url="https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token",
+            token_url=UrlConstants.COPERNICUS_TOKEN.value,
             client_secret=self.client_secret,
         )
         return token
@@ -93,13 +98,16 @@ class Downloader:
         return payload
 
     def download(self, url, payload):
-        oauth = OAuth2Session(client=self.client)
-        url = url
-        payload = payload
+        oauth = self.oauth()
+        logger.info("Using URL: " + url)
         resp = oauth.post(
             url,
             json=payload,
         )
-        logger.info("Save image to file")
+        if resp.status_code != 200:
+            logger.error("Error downloading image")
+            logger.error(resp.content)
+            return
         with open(PNGS_PATH + "image.png", "wb") as f:
             f.write(resp.content)
+        logger.info("Image downloaded")
