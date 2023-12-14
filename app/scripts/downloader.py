@@ -1,14 +1,11 @@
 import logging
 from enum import Enum
 
-from dotenv import load_dotenv
 from oauthlib.oauth2 import BackendApplicationClient
 from requests_oauthlib import OAuth2Session
-from utils.logging import set_logging
 
 from configuration.configuration import Configuration
-
-load_dotenv()
+from utils.logging import set_logging
 
 set_logging()
 logger = logging.getLogger(__name__)
