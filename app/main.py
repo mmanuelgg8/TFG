@@ -1,7 +1,7 @@
 import logging
 import os
 
-from scripts.downloader import UrlConstants, Downloader
+from scripts.downloader import UrlConstants, Downloader, DataTypeConstants
 from utils import set_logging
 
 from configuration.configuration import Configuration
@@ -20,7 +20,7 @@ if __name__ == "__main__":
     bbox = [13.822174072265625, 45.85080395917834, 14.55963134765625, 46.29191774991382]
     data = [
         {
-            "type": "sentinel-2-l2a",
+            "type": DataTypeConstants.SENTINEL2_L2A.value,
             "dataFilter": {"maxCloudCoverage": 30},
         }
     ]

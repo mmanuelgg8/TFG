@@ -20,7 +20,6 @@ TILES_PATH: str = str(configuration["tiles_path"])
 PNGS_PATH: str = str(configuration["pngs_path"])
 
 
-# Let's define an enum for the different data types we can use
 class DataTypeConstants(Enum):
     SENTINEL2_L2A = "sentinel-2-l2a"
     SENTINEL2_L1C = "sentinel-2-l1c"
@@ -95,8 +94,6 @@ class Downloader:
 
     def download(self, url, payload):
         oauth = OAuth2Session(client=self.client)
-        token = self.get_token()
-        # url = "https://sh.dataspace.copernicus.eu/api/v1/process"
         url = url
         payload = payload
         resp = oauth.post(
