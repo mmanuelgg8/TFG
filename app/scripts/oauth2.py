@@ -41,12 +41,12 @@ class Sentinel2Downloader:
         # Get the path to the directory containing this script
         script_directory = os.path.dirname(os.path.abspath(__file__))
         # Assume that evalscripts directory is a sibling of scripts directory
-        evalscripts_directory = os.path.join(script_directory, "..", "scripts", "evalscripts")
+        evalscripts_directory = os.path.join(script_directory, "evalscripts")
         evalscript_path = os.path.join(evalscripts_directory, "evalscript.js")
+        logger.info("Reading from " + evalscript_path)
         with open(evalscript_path, "r") as f:
             evalscript = f.read()
         print(evalscript)
-        # evalscript = evalscript.replace("\n", "", 1)
         payload = {
             "input": {
                 "bounds": {"bbox": [13.822174072265625, 45.85080395917834, 14.55963134765625, 46.29191774991382]},
