@@ -22,6 +22,4 @@ clean:
 run:
 	cd app && pwd && python -m main
 
-oauth-script:
-	python -m app.scripts.oauth2
 
