@@ -16,7 +16,7 @@ if __name__ == "__main__":
     configuration = Configuration()
     EVALSCRIPTS_PATH: str = str(configuration["evalscripts_path"])
 
-    sentinel = Downloader(client_id, client_secret)
+    downloader = Downloader(client_id, client_secret)
     bbox = [13.822174072265625, 45.85080395917834, 14.55963134765625, 46.29191774991382]
     data = [
         {
@@ -31,5 +31,5 @@ if __name__ == "__main__":
 
     print(evalscript)
     url = UrlConstants.COPERNICUS_API_PROCESS.value
-    payload = sentinel.create_payload(bbox, data, evalscript)
-    sentinel.download(url, payload)
+    payload = downloader.create_payload(bbox, data, evalscript)
+    downloader.download(url, payload)
