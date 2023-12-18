@@ -2,4 +2,5 @@
 *.DS_Store
 *.pyc
 
-data/tmp
+data/tmp/pngs/*
+data/tmp/tiles/*
