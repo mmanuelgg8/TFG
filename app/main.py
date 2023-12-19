@@ -19,9 +19,9 @@ if __name__ == "__main__":
     EVALSCRIPTS_PATH: str = str(configuration["evalscripts_path"])
 
     downloader = Downloader(client_id, client_secret)
-    min_x, min_y = 37.162534357525814, -6.215864855019264
-    max_x, max_y = 37.10259292740977, -6.111682075391747
-    # bbox = [13.822174072265625, 45.85080395917834, 14.55963134765625, 46.29191774991382]
+    # Isla Mayor, Sevilla
+    min_x, min_y = -6.215864855019264, 37.162534357525814
+    max_x, max_y = -6.111682075391747, 37.10259292740977
     bbox = [min_x, min_y, max_x, max_y]
     data = [
         {
