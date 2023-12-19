@@ -61,8 +61,8 @@ class UrlConstants(Enum):
 
 class Downloader:
     def __init__(self, client_id, client_secret):
-        self.client_id = client_id
-        self.client_secret = client_secret
+        self.client_id: str = client_id
+        self.client_secret: str = client_secret
 
     def get_token(self, oauth):
         token = oauth.fetch_token(
@@ -73,10 +73,10 @@ class Downloader:
 
     def oauth(self):
         client = BackendApplicationClient(client_id=self.client_id)
-        logger.info("Client created")
+        logger.info("Authenticating with client id: " + str(self.client_id))
         oauth = OAuth2Session(client_id=self.client_id, client=client)
         oauth.token = self.get_token(oauth)
-        logger.info("OAuth created with client id: " + self.client_id)
+        logger.info("Authenticated")
         return oauth
 
     def create_payload(self, bbox, data, evalscript):

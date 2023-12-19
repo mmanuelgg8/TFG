@@ -1,11 +1,13 @@
 import logging
 import os
+from dotenv import load_dotenv
 
 from scripts.downloader import UrlConstants, Downloader, DataTypeConstants
 from utils import set_logging
 
 from configuration.configuration import Configuration
 
+load_dotenv()
 set_logging()
 logger = logging.getLogger(__name__)
 
