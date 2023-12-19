@@ -17,7 +17,10 @@ if __name__ == "__main__":
     EVALSCRIPTS_PATH: str = str(configuration["evalscripts_path"])
 
     downloader = Downloader(client_id, client_secret)
-    bbox = [13.822174072265625, 45.85080395917834, 14.55963134765625, 46.29191774991382]
+    min_x, min_y = 37.162534357525814, -6.215864855019264
+    max_x, max_y = 37.10259292740977, -6.111682075391747
+    # bbox = [13.822174072265625, 45.85080395917834, 14.55963134765625, 46.29191774991382]
+    bbox = [min_x, min_y, max_x, max_y]
     data = [
         {
             "type": DataTypeConstants.SENTINEL2_L2A.value,

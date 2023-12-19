@@ -1,4 +1,5 @@
 import logging
+import openeo as oe
 
 from utils import set_logging
 
