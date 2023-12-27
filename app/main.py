@@ -2,7 +2,7 @@ import logging
 import os
 from dotenv import load_dotenv
 
-from scripts.downloader import UrlConstants, Downloader, DataTypeConstants
+from scripts.downloader import UrlConstants, Downloader, DataTypeConstants, DataFilterConstants, ImageFormatConstants
 from utils import set_logging
 
 from configuration.configuration import Configuration
@@ -26,7 +26,12 @@ if __name__ == "__main__":
     data = [
         {
             "type": DataTypeConstants.SENTINEL2_L2A.value,
-            "dataFilter": {"maxCloudCoverage": 30},
+            "dataFilter": {
+                DataFilterConstants.MAX_CLOUD_COVERAGE.value: 30,
+                DataFilterConstants.MIN_CLOUD_COVERAGE.value: 0,
+                DataFilterConstants.MAX_DATE.value: "2020-01-01",
+                DataFilterConstants.MIN_DATE.value: "2019-01-01",
+            },
         }
     ]
     evalscript_path = os.path.join(EVALSCRIPTS_PATH, "evalscript.js")
@@ -36,5 +41,5 @@ if __name__ == "__main__":
 
     print(evalscript)
     url = UrlConstants.COPERNICUS_API_PROCESS.value
-    payload = downloader.create_payload(bbox, data, evalscript)
+    payload = downloader.create_payload(bbox, data, ImageFormatConstants.TIFF.value, evalscript)
     downloader.download(url, payload)

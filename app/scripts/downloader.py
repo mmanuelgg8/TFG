@@ -59,6 +59,51 @@ class UrlConstants(Enum):
     COPERNICUS_TOKEN = "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token"
 
 
+class DataFilterConstants(Enum):
+    MAX_CLOUD_COVERAGE = "maxCloudCoverage"
+    MIN_CLOUD_COVERAGE = "minCloudCoverage"
+    MAX_DATE = "maxDate"
+    MIN_DATE = "minDate"
+    TIME = "time"
+    GEOMETRY = "geometry"
+    MBR = "mbr"
+    CRS = "crs"
+    GEOMETRY_ID = "geometryId"
+    GEOMETRY_IDS = "geometryIds"
+    ORBIT_DIRECTION = "orbitDirection"
+    PRODUCT_TYPE = "productType"
+    SENSOR_OPERATIONAL_MODE = "sensorOperationalMode"
+    INGESTION_DATE = "ingestionDate"
+    INGESTION_DATE_FROM = "ingestionDateFrom"
+    INGESTION_DATE_TO = "ingestionDateTo"
+    INGESTION_DATE_BEFORE = "ingestionDateBefore"
+    INGESTION_DATE_AFTER = "ingestionDateAfter"
+    INGESTION_DATE_DURING = "ingestionDateDuring"
+    INGESTION_DATE_RELATIVE = "ingestionDateRelative"
+    INGESTION_DATE_RELATIVE_DAYS = "ingestionDateRelativeDays"
+    INGESTION_DATE_RELATIVE_WEEKS = "ingestionDateRelativeWeeks"
+    INGESTION_DATE_RELATIVE_MONTHS = "ingestionDateRelativeMonths"
+    INGESTION_DATE_RELATIVE_YEARS = "ingestionDateRelativeYears"
+    INGESTION_DATE_RELATIVE_TO = "ingestionDateRelativeTo"
+    INGESTION_DATE_RELATIVE_FROM = "ingestionDateRelativeFrom"
+    INGESTION_DATE_RELATIVE_TO_FROM = "ingestionDateRelativeToFrom"
+    INGESTION_DATE_RELATIVE_TO_TO = "ingestionDateRelativeToTo"
+    INGESTION_DATE_RELATIVE_TO_BEFORE = "ingestionDateRelativeToBefore"
+    INGESTION_DATE_RELATIVE_TO_AFTER = "ingestionDateRelativeToAfter"
+    INGESTION_DATE_RELATIVE_TO_DURING = "ingestionDateRelativeToDuring"
+    INGESTION_DATE_RELATIVE_TO_RELATIVE = "ingestionDateRelativeToRelative"
+    INGESTION_DATE_RELATIVE_TO_RELATIVE_DAYS = "ingestionDateRelativeToRelativeDays"
+    INGESTION_DATE_RELATIVE_TO_RELATIVE_WEEKS = "ingestionDateRelativeToRelativeWeeks"
+    INGESTION_DATE_RELATIVE_TO_RELATIVE_MONTHS = "ingestionDateRelativeToRelativeMonths"
+    INGESTION_DATE_RELATIVE_TO_RELATIVE_YEARS = "ingestionDateRelativeToRelativeYears"
+
+
+class ImageFormatConstants(Enum):
+    PNG = "image/png"
+    TIFF = "image/tiff"
+    JPEG = "image/jpeg"
+
+
 class Downloader:
     def __init__(self, client_id, client_secret):
         self.client_id: str = client_id
@@ -79,7 +124,7 @@ class Downloader:
         logger.info("Authenticated")
         return oauth
 
-    def create_payload(self, bbox, data, evalscript):
+    def create_payload(self, bbox, data, format, evalscript):
         payload = {
             "input": {
                 "bounds": {"bbox": bbox},
@@ -88,7 +133,7 @@ class Downloader:
             "output": {
                 "width": 512,
                 "height": 512,
-                "responses": [{"identifier": "default", "format": {"type": "image/png"}}],
+                "responses": [{"identifier": "default", "format": {"type": format}}],
             },
             "evalscript": evalscript,
         }
@@ -105,6 +150,11 @@ class Downloader:
             logger.error("Error downloading image")
             logger.error(resp.content)
             return
-        with open(PNGS_PATH + "image.png", "wb") as f:
-            f.write(resp.content)
+        format = payload["output"]["responses"][0]["format"]["type"]
+        if format == ImageFormatConstants.TIFF.value:
+            with open(GEOTIFFS_PATH + "image.tif", "wb") as f:
+                f.write(resp.content)
+        elif format == ImageFormatConstants.PNG.value:
+            with open(PNGS_PATH + "image.png", "wb") as f:
+                f.write(resp.content)
         logger.info("Image downloaded")
