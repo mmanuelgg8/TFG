@@ -1,10 +1,10 @@
 import logging
+from datetime import datetime, timedelta
 from enum import Enum
 
+from configuration.configuration import Configuration
 from oauthlib.oauth2 import BackendApplicationClient
 from requests_oauthlib import OAuth2Session
-
-from configuration.configuration import Configuration
 from utils.logging import set_logging
 
 set_logging()
@@ -62,9 +62,9 @@ class UrlConstants(Enum):
 class DataFilterConstants(Enum):
     MAX_CLOUD_COVERAGE = "maxCloudCoverage"
     MIN_CLOUD_COVERAGE = "minCloudCoverage"
-    MAX_DATE = "maxDate"
-    MIN_DATE = "minDate"
-    TIME = "time"
+    TIME_RANGE = "timeRange"
+    FROM = "from"
+    TO = "to"
     GEOMETRY = "geometry"
     MBR = "mbr"
     CRS = "crs"
@@ -73,29 +73,6 @@ class DataFilterConstants(Enum):
     ORBIT_DIRECTION = "orbitDirection"
     PRODUCT_TYPE = "productType"
     SENSOR_OPERATIONAL_MODE = "sensorOperationalMode"
-    INGESTION_DATE = "ingestionDate"
-    INGESTION_DATE_FROM = "ingestionDateFrom"
-    INGESTION_DATE_TO = "ingestionDateTo"
-    INGESTION_DATE_BEFORE = "ingestionDateBefore"
-    INGESTION_DATE_AFTER = "ingestionDateAfter"
-    INGESTION_DATE_DURING = "ingestionDateDuring"
-    INGESTION_DATE_RELATIVE = "ingestionDateRelative"
-    INGESTION_DATE_RELATIVE_DAYS = "ingestionDateRelativeDays"
-    INGESTION_DATE_RELATIVE_WEEKS = "ingestionDateRelativeWeeks"
-    INGESTION_DATE_RELATIVE_MONTHS = "ingestionDateRelativeMonths"
-    INGESTION_DATE_RELATIVE_YEARS = "ingestionDateRelativeYears"
-    INGESTION_DATE_RELATIVE_TO = "ingestionDateRelativeTo"
-    INGESTION_DATE_RELATIVE_FROM = "ingestionDateRelativeFrom"
-    INGESTION_DATE_RELATIVE_TO_FROM = "ingestionDateRelativeToFrom"
-    INGESTION_DATE_RELATIVE_TO_TO = "ingestionDateRelativeToTo"
-    INGESTION_DATE_RELATIVE_TO_BEFORE = "ingestionDateRelativeToBefore"
-    INGESTION_DATE_RELATIVE_TO_AFTER = "ingestionDateRelativeToAfter"
-    INGESTION_DATE_RELATIVE_TO_DURING = "ingestionDateRelativeToDuring"
-    INGESTION_DATE_RELATIVE_TO_RELATIVE = "ingestionDateRelativeToRelative"
-    INGESTION_DATE_RELATIVE_TO_RELATIVE_DAYS = "ingestionDateRelativeToRelativeDays"
-    INGESTION_DATE_RELATIVE_TO_RELATIVE_WEEKS = "ingestionDateRelativeToRelativeWeeks"
-    INGESTION_DATE_RELATIVE_TO_RELATIVE_MONTHS = "ingestionDateRelativeToRelativeMonths"
-    INGESTION_DATE_RELATIVE_TO_RELATIVE_YEARS = "ingestionDateRelativeToRelativeYears"
 
 
 class ImageFormatConstants(Enum):
@@ -117,11 +94,13 @@ class Downloader:
         return token
 
     def oauth(self):
-        client = BackendApplicationClient(client_id=self.client_id)
-        logger.info("Authenticating with client id: " + str(self.client_id))
-        oauth = OAuth2Session(client_id=self.client_id, client=client)
-        oauth.token = self.get_token(oauth)
-        logger.info("Authenticated")
+        try:
+            client = BackendApplicationClient(client_id=self.client_id)
+            oauth = OAuth2Session(client_id=self.client_id, client=client)
+            oauth.token = self.get_token(oauth)
+        except Exception as e:
+            logger.error("Error getting token for user id " + self.client_id)
+            raise e
         return oauth
 
     def create_payload(self, bbox, data, format, evalscript):
@@ -139,22 +118,28 @@ class Downloader:
         }
         return payload
 
-    def download(self, url, payload):
+    def download(self, url, payload, image_name):
         oauth = self.oauth()
-        logger.info("Using URL: " + url)
         resp = oauth.post(
             url,
             json=payload,
         )
         if resp.status_code != 200:
-            logger.error("Error downloading image")
+            logger.error("Error downloading image from " + url)
             logger.error(resp.content)
             return
         format = payload["output"]["responses"][0]["format"]["type"]
+        image_path = ""
         if format == ImageFormatConstants.TIFF.value:
-            with open(GEOTIFFS_PATH + "image.tif", "wb") as f:
-                f.write(resp.content)
+            image_path = GEOTIFFS_PATH + image_name + ".tif"
         elif format == ImageFormatConstants.PNG.value:
-            with open(PNGS_PATH + "image.png", "wb") as f:
-                f.write(resp.content)
-        logger.info("Image downloaded")
+            image_path = PNGS_PATH + image_name + ".png"
+        elif format == ImageFormatConstants.JPEG.value:
+            image_path = PNGS_PATH + image_name + ".jpg"
+        with open(image_path, "wb") as f:
+            f.write(resp.content)
+        logger.info(f"Image {image_path} downloaded")
+
+    def daterange(self, start_date, end_date, step=1):
+        for n in range(int((end_date - start_date).days / step)):
+            yield start_date + timedelta(n * step)

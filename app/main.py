@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 from configuration.configuration import Configuration
 from dotenv import load_dotenv
 from scripts.downloader import DataFilterConstants, DataTypeConstants, Downloader, ImageFormatConstants, UrlConstants
-from scripts.openeoClient import OpenEOClient
 from utils import set_logging
 
 load_dotenv()
@@ -25,39 +24,13 @@ if __name__ == "__main__":
     # Define time range
     start_date = datetime(2018, 1, 1)
     end_date = datetime(2019, 1, 1)
-    date_interval = timedelta(weeks=1)  # Daily interval
+    date_interval = timedelta(days=30)
 
-    # Create a list of data requests for each day in the time range
-    data_requests = []
-    current_date = start_date
-    while current_date <= end_date:
-        data_request = {
-            "type": DataTypeConstants.SENTINEL2_L2A.value,
-            "dataFilter": {
-                DataFilterConstants.MAX_CLOUD_COVERAGE.value: 30,
-                DataFilterConstants.MIN_CLOUD_COVERAGE.value: 0,
-                DataFilterConstants.MIN_DATE.value: current_date.strftime("%Y-%m-%d"),
-                DataFilterConstants.MAX_DATE.value: (current_date + date_interval).strftime("%Y-%m-%d"),
-            },
-        }
-        data_requests.append(data_request)
-        current_date += date_interval
     # Isla Mayor, Sevilla
     min_x, min_y = -6.215864855019264, 37.162534357525814
     max_x, max_y = -6.111682075391747, 37.10259292740977
     bbox = [min_x, min_y, max_x, max_y]
-    data = [
-        {
-            "type": DataTypeConstants.SENTINEL2_L2A.value,
-            "dataFilter": {
-                DataFilterConstants.MAX_CLOUD_COVERAGE.value: 30,
-                DataFilterConstants.MIN_CLOUD_COVERAGE.value: 0,
-                DataFilterConstants.MAX_DATE.value: "2020-01-01",
-                DataFilterConstants.MIN_DATE.value: "2019-01-01",
-            },
-        }
-    ]
-    # data = data_requests
+
     evalscript_path = os.path.join(EVALSCRIPTS_PATH, "evalscript.js")
     logger.info("Using evalscript: " + evalscript_path)
     with open(evalscript_path, "r") as f:
@@ -65,9 +38,23 @@ if __name__ == "__main__":
 
     print(evalscript)
     url = UrlConstants.COPERNICUS_API_PROCESS.value
-    payload = downloader.create_payload(bbox, data, ImageFormatConstants.TIFF.value, evalscript)
-    downloader.download(url, payload)
 
-    # # OpenEO
-    # openeo_client = OpenEOClient("https://openeo.dataspace.copernicus.eu/openeo/1.2", client_user, client_password)
-    # download = openeo_client.download("SENTINEL2_L2A", bbox, ("2019-01-01", "2020-01-01"), ["B04", "B08"], "output.tif")
+    for single_date in downloader.daterange(start_date, end_date, step=30):
+        date_start = single_date
+        date_end = single_date + date_interval
+        data = [
+            {
+                "type": DataTypeConstants.SENTINEL2_L2A.value,
+                "dataFilter": {
+                    DataFilterConstants.MAX_CLOUD_COVERAGE.value: 30,
+                    DataFilterConstants.MIN_CLOUD_COVERAGE.value: 0,
+                    DataFilterConstants.TIME_RANGE.value: {
+                        DataFilterConstants.FROM.value: date_start.isoformat() + "Z",
+                        DataFilterConstants.TO.value: date_end.isoformat() + "Z",
+                    },
+                },
+            }
+        ]
+        payload = downloader.create_payload(bbox, data, ImageFormatConstants.TIFF.value, evalscript)
+        name = "image_" + date_start.strftime("%Y-%m-%d") + "_" + date_end.strftime("%Y-%m-%d")
+        downloader.download(url, payload, name)
