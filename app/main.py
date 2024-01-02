@@ -31,7 +31,7 @@ if __name__ == "__main__":
     max_x, max_y = -6.111682075391747, 37.10259292740977
     bbox = [min_x, min_y, max_x, max_y]
 
-    evalscript_path = os.path.join(EVALSCRIPTS_PATH, "evalscript.js")
+    evalscript_path = os.path.join(EVALSCRIPTS_PATH, "ndvi.js")
     logger.info("Using evalscript: " + evalscript_path)
     with open(evalscript_path, "r") as f:
         evalscript = f.read()
