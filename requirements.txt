@@ -2,6 +2,7 @@ requests
 oauthlib
 requests_oauthlib
 python-dotenv
+python-dateutil
 colorlog
 pyhocon
 openeo

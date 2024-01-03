@@ -1,6 +1,8 @@
 import logging
-from datetime import datetime, timedelta
+from calendar import month
+from datetime import datetime
 
+from dateutil.relativedelta import relativedelta
 from scripts.download import download
 from utils import set_logging
 
@@ -15,6 +17,6 @@ if __name__ == "__main__":
     evalscript = "ndvi"
     start_date = datetime(2018, 1, 1)
     end_date = datetime(2019, 1, 1)
-    date_interval = timedelta(days=30)
+    date_interval = relativedelta(months=1) 
     name_id = "islamayor_ndvi_"
     download(bbox, evalscript, start_date, end_date, date_interval, name_id)

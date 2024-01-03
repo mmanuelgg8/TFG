@@ -1,8 +1,10 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
+from typing import Any, Dict
 
 from configuration.configuration import Configuration
+from dateutil.relativedelta import relativedelta
 from oauthlib.oauth2 import BackendApplicationClient
 from requests_oauthlib import OAuth2Session
 from utils.logging import set_logging
@@ -68,9 +70,6 @@ class DataFilterConstants(Enum):
     GEOMETRY = "geometry"
     MBR = "mbr"
     CRS = "crs"
-    GEOMETRY_ID = "geometryId"
-    GEOMETRY_IDS = "geometryIds"
-    ORBIT_DIRECTION = "orbitDirection"
     PRODUCT_TYPE = "productType"
     SENSOR_OPERATIONAL_MODE = "sensorOperationalMode"
 
@@ -86,9 +85,9 @@ class Downloader:
         self.client_id: str = client_id
         self.client_secret: str = client_secret
 
-    def get_token(self, oauth):
+    def get_token(self, oauth, token_url: str = UrlConstants.COPERNICUS_TOKEN.value):
         token = oauth.fetch_token(
-            token_url=UrlConstants.COPERNICUS_TOKEN.value,
+            token_url=token_url,
             client_secret=self.client_secret,
         )
         return token
@@ -118,7 +117,7 @@ class Downloader:
         }
         return payload
 
-    def download(self, url, payload, image_name):
+    def download(self, url: str, payload: Dict[str, Any], image_name: str):
         oauth = self.oauth()
         resp = oauth.post(
             url,
@@ -140,6 +139,12 @@ class Downloader:
             f.write(resp.content)
         logger.info(f"Image {image_path} downloaded")
 
-    def daterange(self, start_date, end_date, step=1):
-        for n in range(int((end_date - start_date).days / step)):
-            yield start_date + timedelta(n * step)
+    # def daterange(self, start_date: datetime, end_date: datetime, step: int = 1):
+    #     for n in range(int((end_date - start_date).days / step)):
+    #         yield start_date + timedelta(n * step)
+
+    def daterange(self, start_date: datetime, end_date: datetime, step: relativedelta = relativedelta(days=1)):
+        current_date = start_date
+        while current_date < end_date:
+            yield current_date
+            current_date += step

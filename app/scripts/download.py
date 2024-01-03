@@ -1,9 +1,10 @@
 import logging
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import List
 
 from configuration.configuration import Configuration
+from dateutil.relativedelta import relativedelta
 from dotenv import load_dotenv
 from utils import set_logging
 from utils.downloader import DataFilterConstants, DataTypeConstants, Downloader, ImageFormatConstants, UrlConstants
@@ -18,9 +19,10 @@ def download(
     evalscript: str,
     start_date: datetime,
     end_date: datetime,
-    date_interval: timedelta,
+    date_interval: relativedelta,
     name_id: str = "image_",
     type: str = DataTypeConstants.SENTINEL2_L2A.value,
+    url: str = UrlConstants.COPERNICUS_API_PROCESS.value,
 ):
     client_id = os.getenv("COPERNICUS_CLIENT_ID")
     client_secret = os.getenv("COPERNICUS_CLIENT_SECRET")
@@ -36,9 +38,8 @@ def download(
         evalscript = f.read()
 
     print(evalscript)
-    url = UrlConstants.COPERNICUS_API_PROCESS.value
 
-    for single_date in downloader.daterange(start_date, end_date, step=30):
+    for single_date in downloader.daterange(start_date, end_date, step=date_interval):
         date_start = single_date
         date_end = single_date + date_interval
         data = [
