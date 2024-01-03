@@ -6,3 +6,8 @@ python-dateutil
 colorlog
 pyhocon
 openeo
+scikit-learn
+matplotlib
+statsmodels
+tensorflow
+keras
