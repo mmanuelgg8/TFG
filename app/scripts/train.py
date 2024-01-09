@@ -29,7 +29,7 @@ def tifs_to_array(tifs_path: str) -> np.ndarray:
     return np.array([rasterio.open(tif).read() for tif in tifs])
 
 
-def train_model(tifs_path: str):
+def train_model(tifs_path: str) -> None:
     tifs = tifs_to_array(tifs_path)
     logger.info("Tifs shape: {}".format(tifs.shape))
 
@@ -81,7 +81,7 @@ def train_model(tifs_path: str):
     logger.info("R2 score: {}".format(r2))
 
 
-def calculate_accuracy(forecast_image, true_tifs_path):
+def calculate_accuracy(forecast_image, true_tifs_path) -> None:
     # Load the true NDVI image for the next month
     true_tifs = tifs_to_array(true_tifs_path)
     true_image = true_tifs.reshape((true_tifs.shape[0], true_tifs.shape[1] * true_tifs.shape[2]))

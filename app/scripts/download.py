@@ -23,7 +23,7 @@ def download(
     name_id: str = "image_",
     type: str = DataTypeConstants.SENTINEL2_L2A.value,
     url: str = UrlConstants.COPERNICUS_API_PROCESS.value,
-):
+) -> None:
     client_id = os.getenv("COPERNICUS_CLIENT_ID")
     client_secret = os.getenv("COPERNICUS_CLIENT_SECRET")
 

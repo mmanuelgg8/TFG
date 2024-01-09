@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict
+from typing import Any, Dict, Generator
 
 from configuration.configuration import Configuration
 from dateutil.relativedelta import relativedelta
@@ -85,14 +85,14 @@ class Downloader:
         self.client_id: str = client_id
         self.client_secret: str = client_secret
 
-    def get_token(self, oauth, token_url: str = UrlConstants.COPERNICUS_TOKEN.value):
+    def get_token(self, oauth, token_url: str = UrlConstants.COPERNICUS_TOKEN.value) -> Dict[str, Any]:
         token = oauth.fetch_token(
             token_url=token_url,
             client_secret=self.client_secret,
         )
         return token
 
-    def oauth(self):
+    def oauth(self) -> OAuth2Session:
         try:
             client = BackendApplicationClient(client_id=self.client_id)
             oauth = OAuth2Session(client_id=self.client_id, client=client)
@@ -102,7 +102,7 @@ class Downloader:
             raise e
         return oauth
 
-    def create_payload(self, bbox, data, format, evalscript):
+    def create_payload(self, bbox, data, format, evalscript) -> Dict[str, Any]:
         payload = {
             "input": {
                 "bounds": {"bbox": bbox},
@@ -117,7 +117,7 @@ class Downloader:
         }
         return payload
 
-    def download(self, url: str, payload: Dict[str, Any], image_name: str):
+    def download(self, url: str, payload: Dict[str, Any], image_name: str) -> None:
         oauth = self.oauth()
         resp = oauth.post(
             url,
@@ -143,7 +143,9 @@ class Downloader:
     #     for n in range(int((end_date - start_date).days / step)):
     #         yield start_date + timedelta(n * step)
 
-    def daterange(self, start_date: datetime, end_date: datetime, step: relativedelta = relativedelta(days=1)):
+    def daterange(
+        self, start_date: datetime, end_date: datetime, step: relativedelta = relativedelta(days=1)
+    ) -> Generator[datetime, None, None]:
         current_date = start_date
         while current_date < end_date:
             yield current_date
