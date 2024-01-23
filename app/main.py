@@ -1,35 +1,50 @@
 import logging
-import os
+from datetime import datetime
+from pathlib import Path
 
-from scripts.downloader import UrlConstants, Downloader, DataTypeConstants
-from utils import set_logging
-
+import numpy as np
+import rasterio
 from configuration.configuration import Configuration
+from dateutil.relativedelta import relativedelta
+from models.arima import ArimaModel
+from scripts.download import download
+from scripts.train import calculate_accuracy, train_arima, train_sarima
+from utils import set_logging
 
 set_logging()
 logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
-    client_id = os.getenv("COPERNICUS_CLIENT_ID")
-    client_secret = os.getenv("COPERNICUS_CLIENT_SECRET")
+    config = Configuration()
+    geotiffs_path = str(config["geotiffs_path"])
+    # Isla Mayor, Sevilla
+    min_x, min_y = -6.215864855019264, 37.162534357525814
+    max_x, max_y = -6.111682075391747, 37.10259292740977
+    bbox = [min_x, min_y, max_x, max_y]
+    evalscript = "ndvi"
+    start_date = datetime(2018, 1, 1)
+    end_date = datetime(2019, 1, 1)
+    date_interval = relativedelta(months=1)
+    name_id = "islamayor_ndvi_"
+    logger.info("Downloading images...")
+    # download(bbox, evalscript, start_date, end_date, date_interval, name_id)
+    # Lets visualize the downloaded images as an array
+    tifs = list(Path(geotiffs_path).glob("*.tif"))
+    logger.info("Found {} tifs".format(len(tifs)))
+    tifs = np.array([rasterio.open(tif).read() for tif in tifs])
+    logger.info("Tifs shape: {}".format(tifs.shape))
+    # logger.info("Tifs: \n{}".format(tifs))
+    # logger.info("Tifs: \n{}".format(tifs[1]))
+    logger.info("Tifs: \n{}".format(tifs[0][0]))
+    # logger.info("Tifs: {}".format(tifs[0][0][0]))
+    # logger.info("Tifs: {}".format(tifs[0][0][0][0]))
 
-    configuration = Configuration()
-    EVALSCRIPTS_PATH: str = str(configuration["evalscripts_path"])
+    logger.info("Training models...")
+    arima = ArimaModel(geotiffs_path)
+    arima.train_model()
+    arima.predict()
+    arima.evaluate()
+    arima.visualize()
 
-    downloader = Downloader(client_id, client_secret)
-    bbox = [13.822174072265625, 45.85080395917834, 14.55963134765625, 46.29191774991382]
-    data = [
-        {
-            "type": DataTypeConstants.SENTINEL2_L2A.value,
-            "dataFilter": {"maxCloudCoverage": 30},
-        }
-    ]
-    evalscript_path = os.path.join(EVALSCRIPTS_PATH, "evalscript.js")
-    logger.info("Using evalscript: " + evalscript_path)
-    with open(evalscript_path, "r") as f:
-        evalscript = f.read()
-
-    print(evalscript)
-    url = UrlConstants.COPERNICUS_API_PROCESS.value
-    payload = downloader.create_payload(bbox, data, evalscript)
-    downloader.download(url, payload)
+    # arima_models = train_arima(geotiffs_path)
+    # sarima_models = train_sarima(geotiffs_path)
