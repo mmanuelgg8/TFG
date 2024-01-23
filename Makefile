@@ -22,4 +22,5 @@ clean:
 run:
 	cd app && pwd && python -m main
 
-
+venv:
+	virtualenv TFG
