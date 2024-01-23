@@ -4,6 +4,7 @@ from datetime import datetime
 from configuration.configuration import Configuration
 from dateutil.relativedelta import relativedelta
 from models.arima import ArimaModel
+from models.simpleCNNModel import SimpleCNNModel
 from scripts.download import download
 from utils import set_logging
 
@@ -26,8 +27,13 @@ if __name__ == "__main__":
     # download(bbox, evalscript, start_date, end_date, date_interval, name_id)
 
     logger.info("Training models...")
-    arima = ArimaModel(geotiffs_path)
-    arima.train_model()
-    arima.predict()
-    arima.evaluate()
-    arima.visualize()
+    # arima = ArimaModel(geotiffs_path)
+    # arima.train_model()
+    # arima.predict()
+    # arima.evaluate()
+    # arima.visualize()
+    simple_cnn = SimpleCNNModel(geotiffs_path)
+    simple_cnn.train_model()
+    simple_cnn.predict()
+    simple_cnn.evaluate()
+    simple_cnn.visualize()

@@ -22,20 +22,23 @@ class ArimaModel(TimeSeriesModel):
         self.predictions: List[np.ndarray] = []
         self.errors: List[float] = []
         self.error_pixels: List[int] = []
+        self.tifs = self.tifs_to_array()
+        logger.info("Tifs reshape: {}".format(self.tifs.shape))
+        #  Transpose to (height, width, bands, time) and reshape as (height * width * bands, time)
+        self.tifs_flat = self.tifs.transpose(2, 3, 1, 0).reshape((-1, self.tifs.shape[-1]))
+        logger.info("Tifs flat shape: {}".format(self.tifs_flat.shape))
+        self.tifs_train = self.tifs_flat[:-5]
+        self.tifs_test = self.tifs_flat[-5:]
 
     def train_model(self) -> None:
-        tifs = self.tifs_to_array()
-        tifs = tifs.transpose(2, 3, 1, 0)  # (height, width, bands, time)
-        tifs_flat = tifs.reshape((-1, tifs.shape[-1]))  # (height * width * bands, time)
-        logger.info("Tifs reshape: {}".format(tifs.shape))
-        logger.info("Tifs flat shape: {}".format(tifs_flat.shape))
+        logger.info("Training {}...".format(self.__class__.__name__))
 
         # Train ARIMA model for each pixel
         self.error_pixels = []
         print_interval = 1000
-        for i in range(tifs_flat.shape[0]):
+        for i in range(self.tifs_train.shape[0]):
             try:
-                model = ARIMA(tifs_flat[i], order=(1, 1, 0))
+                model = ARIMA(self.tifs_train[i], order=(1, 1, 0))
                 model_fit = model.fit()
                 self.models.append(model)
                 self.models_fit.append(model_fit)
@@ -44,9 +47,11 @@ class ArimaModel(TimeSeriesModel):
                 self.error_pixels.append(i)
 
             # Print progress every print_interval iterations
-            if (i + 1) % print_interval == 0 or i == tifs_flat.shape[0] - 1:
-                progress_percentage = (i + 1) / tifs_flat.shape[0] * 100
-                logger.info("Training model {}/{} {:.2f}% done".format(i + 1, tifs_flat.shape[0], progress_percentage))
+            if (i + 1) % print_interval == 0 or i == self.tifs_train.shape[0] - 1:
+                progress_percentage = (i + 1) / self.tifs_train.shape[0] * 100
+                logger.info(
+                    "Training model {}/{} {:.2f}% done".format(i + 1, self.tifs_train.shape[0], progress_percentage)
+                )
 
         logger.info("Training complete.")
 
@@ -64,7 +69,7 @@ class ArimaModel(TimeSeriesModel):
         self.errors = []
         for i in range(len(self.predictions)):
             try:
-                error = mean_squared_error(self.predictions[i][-5:], self.models_fit[i].data.orig_endog[-5:])
+                error = mean_squared_error(self.predictions[i], self.tifs_test[i])
                 self.errors.append(float(error))
             except Exception as e:
                 logger.error(f"Failed to evaluate model for pixel {i}: {e}")
@@ -72,6 +77,7 @@ class ArimaModel(TimeSeriesModel):
     def visualize(self):
         # Visualize the predictions
         for i in range(len(self.predictions)):
-            plt.plot(self.predictions[i])
-            plt.plot(self.models_fit[i].data.orig_endog)
+            plt.plot(self.tifs_test[i], label="True Values")
+            plt.plot(self.predictions[i], label="Predictions")
+            plt.legend()
             plt.show()
