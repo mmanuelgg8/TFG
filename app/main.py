@@ -1,9 +1,6 @@
 import logging
 from datetime import datetime
-from pathlib import Path
 
-import numpy as np
-import rasterio
 from configuration.configuration import Configuration
 from dateutil.relativedelta import relativedelta
 from models.arima import ArimaModel
@@ -27,11 +24,6 @@ if __name__ == "__main__":
     name_id = "islamayor_ndvi_"
     logger.info("Downloading images...")
     # download(bbox, evalscript, start_date, end_date, date_interval, name_id)
-    # Lets visualize the downloaded images as an array
-    tifs = list(Path(geotiffs_path).glob("*.tif"))
-    logger.info("Found {} tifs".format(len(tifs)))
-    tifs = np.array([rasterio.open(tif).read() for tif in tifs])
-    logger.info("Tifs shape: {}".format(tifs.shape))
 
     logger.info("Training models...")
     arima = ArimaModel(geotiffs_path)

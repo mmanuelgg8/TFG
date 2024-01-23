@@ -25,7 +25,6 @@ class ArimaModel(TimeSeriesModel):
 
     def train_model(self) -> None:
         tifs = self.tifs_to_array()
-        logger.info("Tifs shape: {}".format(tifs.shape))
         tifs = tifs.transpose(2, 3, 1, 0)  # (height, width, bands, time)
         tifs_flat = tifs.reshape((-1, tifs.shape[-1]))  # (height * width * bands, time)
         logger.info("Tifs reshape: {}".format(tifs.shape))
@@ -33,6 +32,7 @@ class ArimaModel(TimeSeriesModel):
 
         # Train ARIMA model for each pixel
         self.error_pixels = []
+        print_interval = 1000
         for i in range(tifs_flat.shape[0]):
             try:
                 model = ARIMA(tifs_flat[i], order=(1, 1, 0))
@@ -42,6 +42,13 @@ class ArimaModel(TimeSeriesModel):
             except Exception as e:
                 logger.error(f"Failed to train model for pixel {i}: {e}")
                 self.error_pixels.append(i)
+
+            # Print progress every print_interval iterations
+            if (i + 1) % print_interval == 0 or i == tifs_flat.shape[0] - 1:
+                progress_percentage = (i + 1) / tifs_flat.shape[0] * 100
+                logger.info("Training model {}/{} {:.2f}% done".format(i + 1, tifs_flat.shape[0], progress_percentage))
+
+        logger.info("Training complete.")
 
     def predict(self):
         logger.info("Predicting {}...".format(self.__class__.__name__))
