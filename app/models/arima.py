@@ -1,24 +1,12 @@
 import logging
-from math import sqrt
-from pathlib import Path
 from typing import List
 
-import geopandas as gpd
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
-import rasterio
 from dotenv import load_dotenv
-from keras.layers import LSTM, Dense, Dropout
-from keras.models import Sequential
 from models.forecast import TimeSeriesModel
-from PIL import Image
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
 from statsmodels.tsa.arima.model import ARIMA
-from statsmodels.tsa.statespace.sarimax import SARIMAX
-from statsmodels.tsa.stattools import adfuller
 from utils import set_logging
 
 load_dotenv()

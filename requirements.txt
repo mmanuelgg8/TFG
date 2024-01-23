@@ -11,3 +11,4 @@ matplotlib
 statsmodels
 tensorflow
 keras
+rasterio

@@ -8,7 +8,6 @@ from configuration.configuration import Configuration
 from dateutil.relativedelta import relativedelta
 from models.arima import ArimaModel
 from scripts.download import download
-from scripts.train import calculate_accuracy, train_arima, train_sarima
 from utils import set_logging
 
 set_logging()
@@ -33,11 +32,6 @@ if __name__ == "__main__":
     logger.info("Found {} tifs".format(len(tifs)))
     tifs = np.array([rasterio.open(tif).read() for tif in tifs])
     logger.info("Tifs shape: {}".format(tifs.shape))
-    # logger.info("Tifs: \n{}".format(tifs))
-    # logger.info("Tifs: \n{}".format(tifs[1]))
-    logger.info("Tifs: \n{}".format(tifs[0][0]))
-    # logger.info("Tifs: {}".format(tifs[0][0][0]))
-    # logger.info("Tifs: {}".format(tifs[0][0][0][0]))
 
     logger.info("Training models...")
     arima = ArimaModel(geotiffs_path)
@@ -45,6 +39,3 @@ if __name__ == "__main__":
     arima.predict()
     arima.evaluate()
     arima.visualize()
-
-    # arima_models = train_arima(geotiffs_path)
-    # sarima_models = train_sarima(geotiffs_path)
