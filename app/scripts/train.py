@@ -1,6 +1,7 @@
 import logging
 from math import sqrt
 from pathlib import Path
+from typing import List
 
 import geopandas as gpd
 import matplotlib.pyplot as plt
@@ -15,6 +16,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.statespace.sarimax import SARIMAX
 from statsmodels.tsa.stattools import adfuller
 from utils import set_logging
 
@@ -29,56 +31,40 @@ def tifs_to_array(tifs_path: str) -> np.ndarray:
     return np.array([rasterio.open(tif).read() for tif in tifs])
 
 
-def train_model(tifs_path: str) -> None:
+def train_arima(tifs_path: str) -> List[ARIMA]:
     tifs = tifs_to_array(tifs_path)
     logger.info("Tifs shape: {}".format(tifs.shape))
+    tifs = tifs.transpose(2, 3, 1, 0)  # (height, width, bands, time)
+    tifs_flat = tifs.reshape((-1, tifs.shape[-1]))  # (height * width * bands, time)
+    logger.info("Tifs reshape: {}".format(tifs.shape))
+    logger.info("Tifs flat shape: {}".format(tifs_flat.shape))
 
-    # Reshape tifs array into 2D array where each row is a pixel and each column is a month
-    tifs = tifs.reshape((tifs.shape[0] * tifs.shape[1] * tifs.shape[2], tifs.shape[3]))
+    # Train ARIMA model for each pixel
+    models = []
+    for i in range(tifs_flat.shape[0]):
+        model = ARIMA(tifs_flat[i], order=(1, 1, 0))
+        model_fit = model.fit()
+        models.append(model_fit)
+
+    return models
+
+
+def train_sarima(tifs_path: str) -> List[SARIMAX]:
+    tifs = tifs_to_array(tifs_path)
     logger.info("Tifs shape: {}".format(tifs.shape))
+    tifs = tifs.transpose(2, 3, 1, 0)  # (height, width, bands, time)
+    tifs_flat = tifs.reshape((-1, tifs.shape[-1]))  # (height * width * bands, time)
+    logger.info("Tifs reshape: {}".format(tifs.shape))
+    logger.info("Tifs flat shape: {}".format(tifs_flat.shape))
 
-    # Assume the last column is the target variable (yield)
-    X = tifs[:, :-1]
-    # X = X.reshape((X.shape[0], X.shape[1] * X.shape[2]))
-    X = X.reshape((X.shape[0], 1, X.shape[1]))
-    y = tifs[:, -1]
-    logger.info("X shape: {}".format(X.shape))
-    logger.info("y shape: {}".format(y.shape))
+    # Train SARIMA model for each pixel
+    models = []
+    for i in range(tifs_flat.shape[0]):
+        model = SARIMAX(tifs_flat[i], order=(1, 1, 1), seasonal_order=(1, 1, 1, 12))
+        model_fit = model.fit()
+        models.append(model_fit)
 
-    # Split into train and test sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
-    logger.info("X_train shape: {}".format(X_train.shape))
-    logger.info("X_test shape: {}".format(X_test.shape))
-    logger.info("y_train shape: {}".format(y_train.shape))
-    logger.info("y_test shape: {}".format(y_test.shape))
-
-    # Define the LSTM model
-    model = Sequential()
-    model.add(LSTM(50, input_shape=(X_train.shape[1], X_train.shape[2])))
-    model.add(Dense(1))
-    model.compile(loss="mae", optimizer="adam")
-
-    # Fit the model
-    # history = model.fit(X_train, y_train, epochs=50, batch_size=72, verbose="2", shuffle=False)
-
-    # Fit the model with validation data
-    history_validation = model.fit(
-        X_train, y_train, epochs=50, batch_size=72, validation_data=(X_test, y_test), verbose="0", shuffle=False
-    )
-
-    # Plot the training and validation loss
-    plt.plot(history_validation.history["loss"], label="train")
-    plt.plot(history_validation.history["val_loss"], label="test")
-    plt.legend()
-    plt.show()
-    logger.info("LSTM model fitted")
-
-    # Predict the test set results
-    y_pred = model.predict(X_test)
-
-    # Compute the R2 score
-    r2 = r2_score(y_test, y_pred)
-    logger.info("R2 score: {}".format(r2))
+    return models
 
 
 def calculate_accuracy(forecast_image, true_tifs_path) -> None:
