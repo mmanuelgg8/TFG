@@ -30,7 +30,6 @@ class SimpleCNNModel(TimeSeriesModel):
         self.model = self.build_model()
 
     def build_model(self):
-        data, _ = self.tifs_train.shape
         model = Sequential()
         model.add(Dense(32, activation="relu", input_shape=(self.tifs_train.shape[1],)))
         model.add(Dense(64, activation="relu"))
@@ -38,8 +37,6 @@ class SimpleCNNModel(TimeSeriesModel):
 
     def train_model(self):
         logger.info("Training {}...".format(self.__class__.__name__))
-
-        data, _ = self.tifs_train.shape
 
         self.model.compile(optimizer="adam", loss="mse")
 
