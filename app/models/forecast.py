@@ -26,19 +26,19 @@ class TimeSeriesModel:
         return np.array([rasterio.open(tif).read() for tif in tifs])
 
     def train_model(self) -> None:
-        pass
+        ...
 
     def predict(self) -> None:
-        pass
+        ...
 
     def evaluate(self) -> None:
-        pass
+        ...
 
     def visualize(self) -> None:
-        pass
+        ...
 
     def save(self) -> None:
-        pass
+        ...
 
     def load(self) -> None:
-        pass
+        ...
