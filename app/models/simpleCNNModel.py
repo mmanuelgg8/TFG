@@ -8,14 +8,14 @@ from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 from sklearn.metrics import mean_squared_error
 from utils import set_logging
-from models.forecast import TimeSeriesModel
+from models.forecast import Model
 
 load_dotenv()
 set_logging()
 logger = logging.getLogger(__name__)
 
 
-class SimpleCNNModel(TimeSeriesModel):
+class SimpleCNNModel(Model):
     def __init__(self, geotiffs_path: str):
         super().__init__(geotiffs_path)
         self.predictions: List[np.ndarray] = []

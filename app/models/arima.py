@@ -4,7 +4,7 @@ from typing import List
 import matplotlib.pyplot as plt
 import numpy as np
 from dotenv import load_dotenv
-from models.forecast import TimeSeriesModel
+from models.forecast import Model
 from sklearn.metrics import mean_squared_error
 from statsmodels.tsa.arima.model import ARIMA
 from utils import set_logging
@@ -14,7 +14,7 @@ set_logging()
 logger = logging.getLogger(__name__)
 
 
-class ArimaModel(TimeSeriesModel):
+class ArimaModel(Model):
     def __init__(self, geotiffs_path: str):
         super().__init__(geotiffs_path)
         self.models: List[ARIMA] = []

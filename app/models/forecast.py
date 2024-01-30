@@ -12,7 +12,7 @@ set_logging()
 logger = logging.getLogger(__name__)
 
 
-class TimeSeriesModel:
+class Model:
     config = Configuration()
     geotiffs_path = str(config["geotiffs_path"])
 
