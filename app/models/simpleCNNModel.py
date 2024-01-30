@@ -43,6 +43,7 @@ class SimpleCNNModel(Model):
         # Train the model
         self.model.fit(self.tifs_train, self.tifs_test, epochs=10, batch_size=32, validation_split=0.2)
 
+        self.model.summary()
         logger.info("Training complete.")
 
     def predict(self):
