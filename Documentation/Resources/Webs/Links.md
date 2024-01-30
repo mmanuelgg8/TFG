@@ -12,3 +12,4 @@
 # Machine learning
 
 - [Aprende a PROGRAMAR una RED NEURONAL- Tensorflow, Keras, Sklearn](https://www.youtube.com/watch?v=qTNUbPkR2ao) 2024-01-25
+- [👁‍🗨 ¡Redes Neuronales CONVOLUCIONALES! ¿Cómo funcionan?](https://www.youtube.com/watch?v=V8j1oENVz00) 2024-01-25
