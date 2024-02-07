@@ -4,7 +4,7 @@ from datetime import datetime
 from configuration.configuration import Configuration
 from dateutil.relativedelta import relativedelta
 from models.arima import ArimaModel
-from models.simpleCNNModel import SimpleCNNModel
+from models.randomForest import RandomForestModel
 from scripts.download import download
 from utils import set_logging
 
@@ -19,21 +19,19 @@ if __name__ == "__main__":
     max_x, max_y = -6.111682075391747, 37.10259292740977
     bbox = [min_x, min_y, max_x, max_y]
     evalscript = "ndvi"
-    start_date = datetime(2018, 1, 1)
-    end_date = datetime(2019, 1, 1)
-    date_interval = relativedelta(months=1)
+    start_date = datetime(2017, 1, 1)
+    end_date = datetime(2022, 1, 1)
+    date_interval = relativedelta(weeks=1)
     name_id = "islamayor_ndvi_"
     logger.info("Downloading images...")
     # download(bbox, evalscript, start_date, end_date, date_interval, name_id)
 
     logger.info("Training models...")
-    # arima = ArimaModel(geotiffs_path)
-    # arima.train_model()
-    # arima.predict()
-    # arima.evaluate()
-    # arima.visualize()
-    simple_cnn = SimpleCNNModel(geotiffs_path)
-    simple_cnn.train_model()
-    simple_cnn.predict()
-    simple_cnn.evaluate()
-    simple_cnn.visualize()
+    arima = ArimaModel(geotiffs_path, date_interval, start_date)
+    random_forest = RandomForestModel(geotiffs_path, date_interval, start_date)
+
+    arima.train_model()
+    random_forest.train_model()
+
+    arima.evaluate()
+    random_forest.evaluate()

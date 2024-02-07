@@ -23,12 +23,13 @@ def download(
     name_id: str = "image_",
     type: str = DataTypeConstants.SENTINEL2_L2A.value,
     url: str = UrlConstants.COPERNICUS_API_PROCESS.value,
-) -> None:
+):
     client_id = os.getenv("COPERNICUS_CLIENT_ID")
     client_secret = os.getenv("COPERNICUS_CLIENT_SECRET")
 
     configuration = Configuration()
     EVALSCRIPTS_PATH: str = str(configuration["evalscripts_path"])
+    GEOTIFFS_PATH: str = str(configuration["geotiffs_path"])
 
     downloader = Downloader(client_id, client_secret)
 

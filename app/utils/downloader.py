@@ -119,25 +119,37 @@ class Downloader:
 
     def download(self, url: str, payload: Dict[str, Any], image_name: str) -> None:
         oauth = self.oauth()
-        resp = oauth.post(
-            url,
-            json=payload,
-        )
-        if resp.status_code != 200:
-            logger.error("Error downloading image from " + url)
+        resp = oauth.post(url, json=payload)
+        error = resp.status_code != 200
+
+        if error:
+            logger.error(f"Error downloading image from {url}")
             logger.error(resp.content)
-            return
+
         format = payload["output"]["responses"][0]["format"]["type"]
-        image_path = ""
-        if format == ImageFormatConstants.TIFF.value:
-            image_path = GEOTIFFS_PATH + image_name + ".tif"
-        elif format == ImageFormatConstants.PNG.value:
-            image_path = PNGS_PATH + image_name + ".png"
-        elif format == ImageFormatConstants.JPEG.value:
-            image_path = PNGS_PATH + image_name + ".jpg"
+        image_path = self.get_image_path(format, image_name, error)
+
         with open(image_path, "wb") as f:
-            f.write(resp.content)
+            f.write(resp.content if not error else b"")
+
         logger.info(f"Image {image_path} downloaded")
+
+    def get_image_path(self, format: str, image_name: str, error: bool) -> str:
+        path = ""
+        file_extension = ""
+
+        if format == ImageFormatConstants.TIFF.value:
+            path = GEOTIFFS_PATH
+            file_extension = ".tif"
+        elif format == ImageFormatConstants.PNG.value:
+            path = PNGS_PATH
+            file_extension = ".png"
+        elif format == ImageFormatConstants.JPEG.value:
+            path = PNGS_PATH
+            file_extension = ".jpg"
+
+        error_suffix = "-error" if error else ""
+        return f"{path}{image_name}{file_extension}{error_suffix}"
 
     # def daterange(self, start_date: datetime, end_date: datetime, step: int = 1):
     #     for n in range(int((end_date - start_date).days / step)):
