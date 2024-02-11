@@ -1,14 +1,9 @@
 from datetime import datetime
 import logging
-from typing import List
 from matplotlib.dates import relativedelta
 
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
 from dotenv import load_dotenv
 from models.forecast import Model
-from scripts.kpis import KPIs
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from statsmodels.tsa.arima.model import ARIMA
@@ -20,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class ArimaModel(Model):
+
     def __init__(self, geotiffs_paths: str, date_interval: relativedelta, start_date: datetime):
         super().__init__(geotiffs_paths, date_interval, start_date)
 
@@ -28,6 +24,8 @@ class ArimaModel(Model):
 
         self.preprocess_data()
         self.train, self.test = train_test_split(self.df, test_size=0.2, shuffle=False)
+        logger.info("Train: \n{}".format(self.train))
+        print("Test: \n{}".format(self.test))
         self.model = ARIMA(self.train["mean"], order=(5, 1, 0))
         self.model_fit = self.model.fit()
 

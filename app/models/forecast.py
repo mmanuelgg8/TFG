@@ -27,6 +27,7 @@ class Model:
         self.start_date = start_date
         self.tifs, self.time = self.tifs_to_array()
         self.ndvis = self.tifs[:, 3, :, :]  # (idx, height, width) Getting the NDVI band
+        self.ndvis = self.tifs[:, 2, :, :]  # (idx, height, width) Getting the NDVI band
 
     def preprocess_data(self):
         self.ndvis = self.ndvis.transpose(1, 2, 0)  # (height, width, time)
@@ -36,7 +37,7 @@ class Model:
         logger.info("Mean shape: {}".format(self.mean.shape))
         self.feature_matrix = np.column_stack((self.mean, self.time))  # Stack the KPIs and the time values
         columns = ["mean", "time"]
-        self.df = pd.DataFrame(self.feature_matrix, columns=columns)
+        self.df = pd.DataFrame(data=self.feature_matrix, columns=columns)
 
     def tifs_to_array(self) -> Tuple[np.ndarray, np.ndarray]:
         tifs = []
@@ -46,18 +47,19 @@ class Model:
         # Get all the tifs in the geotiffs path and append them to the list.
         # If the name of the file does not end with "-error", append it to the list.
         for tif in sorted(Path(self.geotiffs_path).iterdir()):
-            # Calculate the current date
-            current_date += self.date_interval
+            if not tif.name.endswith(".xml"):
+                # Calculate the current date
+                current_date += self.date_interval
 
-            if not tif.name.endswith("-error"):
-                with rasterio.open(tif) as src:
-                    tifs.append(src.read())
+                if not tif.name.endswith("-error"):
+                    with rasterio.open(tif) as src:
+                        tifs.append(src.read())
 
-                # Add the month number or week number to the time_values list depending on the date_interval
-                if self.date_interval.months > 0:
-                    time_values.append(current_date.month)
-                else:  # Assume weeks if not months
-                    time_values.append(current_date.isocalendar()[1])
+                    # Add the month number or week number to the time_values list depending on the date_interval
+                    if self.date_interval.months > 0:
+                        time_values.append(current_date.month)
+                    else:  # Assume weeks if not months
+                        time_values.append(current_date.isocalendar()[1])
 
         tifs = np.array(tifs)
         logger.info("TIFs shape: {}".format(tifs.shape))

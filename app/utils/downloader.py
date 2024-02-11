@@ -81,6 +81,7 @@ class ImageFormatConstants(Enum):
 
 
 class Downloader:
+
     def __init__(self, client_id, client_secret):
         self.client_id: str = client_id
         self.client_secret: str = client_secret
