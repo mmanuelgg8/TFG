@@ -2,11 +2,8 @@ from datetime import datetime
 import logging
 from matplotlib.dates import relativedelta
 
-import numpy as np
-import pandas as pd
 from dotenv import load_dotenv
-from models.forecast import Model
-from scripts.kpis import KPIs
+from models.ml_model import Model
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from sklearn.ensemble import RandomForestRegressor
@@ -26,6 +23,7 @@ class RandomForestModel(Model):
         # Train the model on the mean over time
         self.preprocess_data()
         self.train, self.test = train_test_split(self.df, test_size=0.2, shuffle=False)
+        logger.info("Train: \n{}".format(self.train))
         self.model = RandomForestRegressor(n_estimators=100)
         self.model.fit(self.train, self.train["mean"])
 

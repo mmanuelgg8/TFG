@@ -3,7 +3,7 @@ import logging
 from matplotlib.dates import relativedelta
 
 from dotenv import load_dotenv
-from models.forecast import Model
+from models.ml_model import Model
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from statsmodels.tsa.arima.model import ARIMA
@@ -25,7 +25,6 @@ class ArimaModel(Model):
         self.preprocess_data()
         self.train, self.test = train_test_split(self.df, test_size=0.2, shuffle=False)
         logger.info("Train: \n{}".format(self.train))
-        print("Test: \n{}".format(self.test))
         self.model = ARIMA(self.train["mean"], order=(5, 1, 0))
         self.model_fit = self.model.fit()
 
