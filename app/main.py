@@ -4,7 +4,7 @@ from datetime import datetime
 from configuration.configuration import Configuration
 from dateutil.relativedelta import relativedelta
 from models.arima import ArimaModel
-from models.randomForest import RandomForestModel
+from models.random_forest import RandomForestModel
 from scripts.download import download
 from utils import set_logging
 
