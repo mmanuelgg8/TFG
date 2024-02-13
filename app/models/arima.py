@@ -22,7 +22,6 @@ class ArimaModel(Model):
     def train_model(self) -> None:
         logger.info("Training {}...".format(self.__class__.__name__))
 
-        self.preprocess_data()
         self.train, self.test = train_test_split(self.df, test_size=0.2, shuffle=False)
         logger.info("Train: \n{}".format(self.train))
         self.model: ARIMA = ARIMA(self.train["mean"], order=(5, 1, 0))

@@ -1,15 +1,16 @@
+import logging
 from datetime import datetime
 from enum import Enum
-import logging
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
-from matplotlib.dates import relativedelta
 
 import numpy as np
 import pandas as pd
 import rasterio
-from configuration.configuration import Configuration
 from dotenv import load_dotenv
+from matplotlib.dates import relativedelta
+
+from configuration.configuration import Configuration
 from utils import set_logging
 
 load_dotenv()
@@ -32,16 +33,12 @@ class Model:
 
     def __init__(
         self,
-        geotiffs_path: str,
         date_interval: relativedelta,
         start_date: datetime,
         band_names: List[str],
         formula: str,
     ):
-        self.geotiffs_path = geotiffs_path
-        self.date_interval = date_interval
-        self.start_date = start_date
-        tifs, time = self.tifs_to_array()  # Time is an array with the month number or week number of the tif
+        tifs, time = self.tifs_to_array(start_date, date_interval)
         bands: List[Dict[str, List[Any]]] = self.extract_bands_from_tifs(band_names, tifs)
         logger.info("Band names: {}".format(band_names))
 
@@ -69,18 +66,20 @@ class Model:
         return eval(formula, bands)
 
     def extract_bands_from_tifs(self, band_names, tifs) -> List[Dict[str, List[Any]]]:
-        # Extract the bands from the tifs and store them in a list
-        # The bands are stored in a dictionary with the band name as the key and the band as the value
-        # For example, if the band names are ["B04", "B08"], the dictionary will be {"B04": <band4>, "B08": <band8>}
+        """
+        Extract the bands from a list of tifs and store them in a list
+        """
         bands = []
         for tif in tifs:
             bands.append(self.extract_bands_from_tif(band_names, tif))
         return bands
 
     def extract_bands_from_tif(self, band_names, tif) -> Dict[str, List[Any]]:
-        # Extract the bands from the tifs and store them in a list
-        # The bands are stored in a dictionary with the band name as the key and the band as the value
-        # For example, if the band names are ["B04", "B08"], the dictionary will be {"B04": <band4>, "B08": <band8>}
+        """
+        Extract the bands from a tif and store them in a dictionary
+        The dictionary will have the band name as the key and the band as the value
+        For example, if the band names are ["B04", "B08"], the dictionary will be {"B04": <band4>, "B08": <band8>}
+        """
         bands = {}
         with rasterio.open(tif) as src:
             data = src.read()
@@ -88,29 +87,24 @@ class Model:
                 bands[band] = data[i]
         return bands
 
-    def preprocess_data(self):
-        # Get a dataframe with the KPIs (mean, as an example) of the evaluated formulas and the time each kpi
-        # Example: dataframe = pd.DataFrame({"NDVI": [0.5, 0.6, 0.7], "time": [1, 2, 3]})
-        # The dataframe will have the KPIs of the evaluated formulas and the time each kpi
-        pass
-
-    def tifs_to_array(self) -> Tuple[np.ndarray, np.ndarray]:
+    def tifs_to_array(self, start_date, date_interval) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Convert the tifs to a numpy array and return the array and the time values
+        """
         tifs = []
         time_values = []
-        current_date = self.start_date
+        current_date = start_date
 
-        # Get all the tifs in the geotiffs path and append them to the list.
-        # If the name of the file does not end with "-error", append it to the list.
         for tif in sorted(Path(self.geotiffs_path).iterdir()):
             if not tif.name.endswith(".xml"):
                 # Calculate the current date
-                current_date += self.date_interval
+                current_date += date_interval
 
                 if not tif.name.endswith("-error"):
                     tifs.append(tif)
 
                     # Add the month number or week number to the time_values list depending on the date_interval
-                    if self.date_interval.months > 0:
+                    if date_interval.months > 0:
                         time_values.append(current_date.month)
                     else:  # Assume weeks if not months
                         time_values.append(current_date.isocalendar()[1])

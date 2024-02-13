@@ -12,8 +12,6 @@ set_logging()
 logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
-    config = Configuration()
-    geotiffs_path = str(config["geotiffs_path"])
     # Isla Mayor, Sevilla
     min_x, min_y = -6.215864855019264, 37.162534357525814
     max_x, max_y = -6.111682075391747, 37.10259292740977
@@ -28,8 +26,8 @@ if __name__ == "__main__":
     # download(bbox, evalscript, start_date, end_date, date_interval, name_id)
 
     logger.info("Training models...")
-    # arima = ArimaModel(geotiffs_path, date_interval, start_date)
-    random_forest = RandomForestModel(geotiffs_path, date_interval, start_date, ["B04", "B08"], "NDVI")
+    # arima = ArimaModel(date_interval, start_date)
+    random_forest = RandomForestModel(date_interval, start_date, ["B04", "B08"], "NDVI")
 
     # arima.train_model()
     random_forest.train_model()
