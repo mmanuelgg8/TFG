@@ -2,7 +2,7 @@
 function setup() {
   return {
     input: ["B04", "B08", "dataMask"],
-    output: { bands: 4 }
+    output: { bands: 2 }
   };
 }
 
@@ -44,7 +44,12 @@ const ramp = [
 const visualizer = new ColorRampVisualizer(ramp);
 
 function evaluatePixel(samples) {
-  let ndvi = index(samples.B08, samples.B04);
-  let imgVals = visualizer.process(ndvi);
-  return imgVals.concat(samples.dataMask);
+  // let ndvi = index(samples.B08, samples.B04);
+  // let imgVals = visualizer.process(ndvi);
+  // return imgVals.concat(samples.dataMask);
+  let ndvi = (samples.B08 - samples.B04) / (samples.B08 + samples.B04);
+  let val = isNaN(ndvi) ? -1 : ndvi;
+  let rgba = visualizer.process(val);
+  let result = [val, samples.dataMask];
+  return result;
 }
