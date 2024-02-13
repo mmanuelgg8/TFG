@@ -40,21 +40,31 @@ class Model:
     ):
         tifs, time = self.tifs_to_array(start_date, date_interval)
         bands: List[Dict[str, List[Any]]] = self.extract_bands_from_tifs(band_names, tifs)
+
         logger.info("Band names: {}".format(band_names))
-
-        if formula in FormulaConstants.__members__:
-            self.formula = FormulaConstants[formula].value
-        else:
-            self.formula = formula
-
         logger.info("Bands: {}".format(bands))
-        logger.info("Band B04: {}".format(bands[0]["B04"]))
-        data: np.ndarray = np.array([self.apply_formula(self.formula, band) for band in bands])
-        # Clean Nan values
-        data = np.nan_to_num(data)
+
+        data: np.ndarray = self.get_data(self.parse_formula(formula), bands)
+
         logger.info("Data shape: {}".format(data.shape))
         logger.info("Data: {}".format(data))
+
         self.df = pd.DataFrame({"mean": data.mean(axis=0), "time": time})
+
+    def parse_formula(self, formula: str) -> str:
+        """
+        If the formula is a constant, get the value of the constant
+        """
+        if formula in FormulaConstants.__members__:
+            return FormulaConstants[formula].value
+        return formula
+
+    def get_data(self, formula: str, bands: List[Dict[str, List[Any]]]) -> np.ndarray:
+        """
+        Get the data from the bands using the formula
+        """
+        data = np.array([self.apply_formula(formula, band) for band in bands])
+        return np.nan_to_num(data)
 
     def apply_formula(self, formula: str, bands: Dict[str, List[Any]]):
         """
