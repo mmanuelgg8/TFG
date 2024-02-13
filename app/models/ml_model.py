@@ -1,12 +1,12 @@
 from datetime import datetime
+from enum import Enum
 import logging
 from pathlib import Path
-from typing import Tuple
+from typing import Any, Dict, List, Tuple
 from matplotlib.dates import relativedelta
 
 import numpy as np
 import pandas as pd
-from scripts.kpis import KPIs
 import rasterio
 from configuration.configuration import Configuration
 from dotenv import load_dotenv
@@ -17,27 +17,73 @@ set_logging()
 logger = logging.getLogger(__name__)
 
 
+class FormulaConstants(Enum):
+    NDVI = "(B08 - B04) / (B08 + B04)"
+    NDWI = "(B03 - B08) / (B03 + B08)"
+    NDBI = "(B11 - B08) / (B11 + B08)"
+    EVI = "2.5 * ((B08 - B04) / (B08 + 6 * B04 - 7.5 * B02 + 1))"
+    SAVI = "((B08 - B04) / (B08 + B04 + 0.5)) * (1 + 0.5)"
+    ARVI = "(B08 - (2 * B04 - B02)) / (B08 + (2 * B04 - B02))"
+
+
 class Model:
     config = Configuration()
     geotiffs_path = str(config["geotiffs_path"])
 
-    def __init__(self, geotiffs_path: str, date_interval: relativedelta, start_date: datetime):
+    def __init__(
+        self,
+        geotiffs_path: str,
+        date_interval: relativedelta,
+        start_date: datetime,
+        band_names: List[str],
+        formula: str,
+    ):
         self.geotiffs_path = geotiffs_path
         self.date_interval = date_interval
         self.start_date = start_date
-        self.tifs, self.time = self.tifs_to_array()
-        self.ndvis = self.tifs[:, 3, :, :]  # (idx, height, width) Getting the NDVI band
-        self.ndvis = self.tifs[:, 2, :, :]  # (idx, height, width) Getting the NDVI band
+        self.tifs, self.time = self.tifs_to_array()  # Time is an array with the month number or week number of the tif
+        self.bands: Dict[str, List[float]] = self.extract_bands(band_names)
+        logger.info("TIFs shape: {}".format(self.tifs.shape))
+        logger.info("Band names: {}".format(band_names))
+
+        if formula in FormulaConstants.__members__:
+            self.formula = FormulaConstants[formula].value
+        else:
+            self.formula = formula
+
+        logger.info("TIFs shape: {}".format(self.tifs.shape))
+        logger.info("Bands: {}".format(self.bands))
+        logger.info("Band B04: {}".format(self.bands["B04"]))
+        self.data = self.apply_formula(self.formula, self.bands)
+        logger.info("Data shape: {}".format(self.data.shape))
+        logger.info("Data: {}".format(self.data))
+
+    def apply_formula(self, formula: str, bands: Dict[str, List[Any]]):
+        """
+        Apply the formula to the bands replacing the band names with the actual values
+        For example, if the formula is "NDVI = (B08 - B04) / (B08 + B04)", the band names are ["B08", "B04"] and the values are [band8, band4]
+        the result is (band8 - band4) / (band8 + band4)
+        """
+
+        return eval(formula, bands)
+
+    def extract_bands(self, band_names) -> Dict[str, List[Any]]:
+        # Extract the bands from the tifs and store them in a list
+        # The bands are stored in a dictionary with the band name as the key and the band as the value
+        # For example, if the band names are ["B04", "B08"], the dictionary will be {"B04": <band4>, "B08": <band8>}
+        bands = {}
+        for tif in self.tifs:
+            with rasterio.open(tif) as src:
+                data = src.read()
+                for i, band in enumerate(band_names):
+                    bands[band] = data[i]
+        return bands
 
     def preprocess_data(self):
-        self.ndvis = self.ndvis.transpose(1, 2, 0)  # (height, width, time)
-        self.ndvis = self.ndvis.reshape(-1, self.ndvis.shape[-1])  # (height * width, time)
-        kpis = KPIs(self.ndvis, axis=0)
-        self.mean = kpis.get_mean()
-        logger.info("Mean shape: {}".format(self.mean.shape))
-        self.feature_matrix = np.column_stack((self.mean, self.time))  # Stack the KPIs and the time values
-        columns = ["mean", "time"]
-        self.df = pd.DataFrame(data=self.feature_matrix, columns=columns)
+        # Get a dataframe with the KPIs (mean, as an example) of the evaluated formulas and the time each kpi
+        # Example: dataframe = pd.DataFrame({"NDVI": [0.5, 0.6, 0.7], "time": [1, 2, 3]})
+        # The dataframe will have the KPIs of the evaluated formulas and the time each kpi
+        pass
 
     def tifs_to_array(self) -> Tuple[np.ndarray, np.ndarray]:
         tifs = []
@@ -52,8 +98,7 @@ class Model:
                 current_date += self.date_interval
 
                 if not tif.name.endswith("-error"):
-                    with rasterio.open(tif) as src:
-                        tifs.append(src.read())
+                    tifs.append(tif)
 
                     # Add the month number or week number to the time_values list depending on the date_interval
                     if self.date_interval.months > 0:

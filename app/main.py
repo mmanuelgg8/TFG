@@ -20,6 +20,7 @@ if __name__ == "__main__":
     bbox = [min_x, min_y, max_x, max_y]
     evalscript = "ndvi"
     start_date = datetime(2017, 1, 1)
+    start_date = datetime(2021, 1, 1)
     end_date = datetime(2022, 1, 1)
     date_interval = relativedelta(weeks=1)
     name_id = "islamayor_ndvi_"
@@ -27,11 +28,11 @@ if __name__ == "__main__":
     # download(bbox, evalscript, start_date, end_date, date_interval, name_id)
 
     logger.info("Training models...")
-    arima = ArimaModel(geotiffs_path, date_interval, start_date)
-    random_forest = RandomForestModel(geotiffs_path, date_interval, start_date)
+    # arima = ArimaModel(geotiffs_path, date_interval, start_date)
+    random_forest = RandomForestModel(geotiffs_path, date_interval, start_date, ["B04", "B08"], "NDVI")
 
-    arima.train_model()
+    # arima.train_model()
     random_forest.train_model()
 
-    arima.evaluate()
+    # arima.evaluate()
     random_forest.evaluate()
