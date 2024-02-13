@@ -29,7 +29,6 @@ def download(
 
     configuration = Configuration()
     EVALSCRIPTS_PATH: str = str(configuration["evalscripts_path"])
-    GEOTIFFS_PATH: str = str(configuration["geotiffs_path"])
 
     downloader = Downloader(client_id, client_secret)
 

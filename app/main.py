@@ -1,7 +1,6 @@
 import logging
 from datetime import datetime
 
-from configuration.configuration import Configuration
 from dateutil.relativedelta import relativedelta
 from models.arima import ArimaModel
 from models.random_forest import RandomForestModel
