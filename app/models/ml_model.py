@@ -41,9 +41,8 @@ class Model:
         self.geotiffs_path = geotiffs_path
         self.date_interval = date_interval
         self.start_date = start_date
-        self.tifs, self.time = self.tifs_to_array()  # Time is an array with the month number or week number of the tif
-        self.bands: Dict[str, List[float]] = self.extract_bands(band_names)
-        logger.info("TIFs shape: {}".format(self.tifs.shape))
+        tifs, time = self.tifs_to_array()  # Time is an array with the month number or week number of the tif
+        bands: List[Dict[str, List[Any]]] = self.extract_bands_from_tifs(band_names, tifs)
         logger.info("Band names: {}".format(band_names))
 
         if formula in FormulaConstants.__members__:
@@ -51,12 +50,14 @@ class Model:
         else:
             self.formula = formula
 
-        logger.info("TIFs shape: {}".format(self.tifs.shape))
-        logger.info("Bands: {}".format(self.bands))
-        logger.info("Band B04: {}".format(self.bands["B04"]))
-        self.data = self.apply_formula(self.formula, self.bands)
-        logger.info("Data shape: {}".format(self.data.shape))
-        logger.info("Data: {}".format(self.data))
+        logger.info("Bands: {}".format(bands))
+        logger.info("Band B04: {}".format(bands[0]["B04"]))
+        data: np.ndarray = np.array([self.apply_formula(self.formula, band) for band in bands])
+        # Clean Nan values
+        data = np.nan_to_num(data)
+        logger.info("Data shape: {}".format(data.shape))
+        logger.info("Data: {}".format(data))
+        self.df = pd.DataFrame({"mean": data.mean(axis=0), "time": time})
 
     def apply_formula(self, formula: str, bands: Dict[str, List[Any]]):
         """
@@ -67,16 +68,24 @@ class Model:
 
         return eval(formula, bands)
 
-    def extract_bands(self, band_names) -> Dict[str, List[Any]]:
+    def extract_bands_from_tifs(self, band_names, tifs) -> List[Dict[str, List[Any]]]:
+        # Extract the bands from the tifs and store them in a list
+        # The bands are stored in a dictionary with the band name as the key and the band as the value
+        # For example, if the band names are ["B04", "B08"], the dictionary will be {"B04": <band4>, "B08": <band8>}
+        bands = []
+        for tif in tifs:
+            bands.append(self.extract_bands_from_tif(band_names, tif))
+        return bands
+
+    def extract_bands_from_tif(self, band_names, tif) -> Dict[str, List[Any]]:
         # Extract the bands from the tifs and store them in a list
         # The bands are stored in a dictionary with the band name as the key and the band as the value
         # For example, if the band names are ["B04", "B08"], the dictionary will be {"B04": <band4>, "B08": <band8>}
         bands = {}
-        for tif in self.tifs:
-            with rasterio.open(tif) as src:
-                data = src.read()
-                for i, band in enumerate(band_names):
-                    bands[band] = data[i]
+        with rasterio.open(tif) as src:
+            data = src.read()
+            for i, band in enumerate(band_names):
+                bands[band] = data[i]
         return bands
 
     def preprocess_data(self):
@@ -110,6 +119,7 @@ class Model:
         logger.info("TIFs shape: {}".format(tifs.shape))
         time_values = np.array(time_values)
         logger.info("Time values shape: {}".format(time_values.shape))
+        logger.info("Time values: {}".format(time_values))
 
         return (tifs, time_values)
 
