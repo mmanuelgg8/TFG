@@ -17,7 +17,7 @@ if __name__ == "__main__":
     bbox = [min_x, min_y, max_x, max_y]
     evalscript = "ndvi"
     start_date = datetime(2017, 1, 1)
-    start_date = datetime(2021, 1, 1)
+    # start_date = datetime(2021, 1, 1)
     end_date = datetime(2022, 1, 1)
     date_interval = relativedelta(weeks=1)
     name_id = "islamayor_ndvi_"

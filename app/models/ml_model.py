@@ -21,11 +21,12 @@ logger = logging.getLogger(__name__)
 
 class FormulaConstants(Enum):
     NDVI = "(B08 - B04) / (B08 + B04)"
+    EVI = "2.5 * (B08 - B04) / (B08 + 6 * B04 - 7.5 * B02 + 1)"
+    LSWI = "(B08 - B11) / (B08 + B11)"
     NDWI = "(B03 - B08) / (B03 + B08)"
-    NDBI = "(B11 - B08) / (B11 + B08)"
-    EVI = "2.5 * ((B08 - B04) / (B08 + 6 * B04 - 7.5 * B02 + 1))"
-    SAVI = "((B08 - B04) / (B08 + B04 + 0.5)) * (1 + 0.5)"
-    ARVI = "(B08 - (2 * B04 - B02)) / (B08 + (2 * B04 - B02))"
+    NDSI = "(B03 - B11) / (B03 + B11)"
+    NBR = "(B08 - B12) / (B08 + B12)"
+    MNDWI = "(B03 - B08) / (B03 + B08)"
 
 
 class Model:
@@ -50,14 +51,14 @@ class Model:
         logger.info("Data shape: {}".format(data.shape))
         logger.info("Data: {}".format(data))
 
-        self.df = pd.DataFrame({"mean": data.mean(axis=0), "time": time})
+        self.df: pd.DataFrame = self.create_dataframe(data, time, KPIsConstants.MEAN, axis=(1, 2))
 
     def get_dataframe(self) -> pd.DataFrame:
         return self.df
 
-    def create_dataframe(self, data: np.ndarray, time: np.ndarray, kpi_name: str, axis) -> pd.DataFrame:
-        kpi = KPIs(data, axis=axis, kpi=KPIsConstants[kpi_name])
-        return pd.DataFrame({kpi_name: kpi.get_kpi(), "time": time})
+    def create_dataframe(self, data: np.ndarray, time: np.ndarray, kpi_name, axis) -> pd.DataFrame:
+        kpi = KPIs(data, axis=axis, kpi=kpi_name)
+        return pd.DataFrame({kpi_name.value: kpi.get_kpi(), "time": time})
 
     def parse_formula(self, formula: str) -> str:
         """
@@ -67,12 +68,12 @@ class Model:
             return FormulaConstants[formula].value
         return formula
 
-    def get_data(self, formula: str, bands: List[Dict[str, List[Any]]]) -> np.ndarray:
+    def get_data(self, formula: str, bands: List[Dict[str, Any]]) -> np.ndarray:
         """
         Get the data from the bands using the formula
         """
         data = np.array([self.apply_formula(formula, band) for band in bands])
-        return np.nan_to_num(data)
+        return np.nan_to_num(data, nan=0, posinf=0, neginf=0)
 
     def apply_formula(self, formula: str, bands: Dict[str, List[Any]]):
         """
