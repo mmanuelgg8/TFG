@@ -9,6 +9,7 @@ import pandas as pd
 import rasterio
 from dotenv import load_dotenv
 from matplotlib.dates import relativedelta
+from scripts.kpis import KPIs, KPIsConstants
 
 from configuration.configuration import Configuration
 from utils import set_logging
@@ -50,6 +51,13 @@ class Model:
         logger.info("Data: {}".format(data))
 
         self.df = pd.DataFrame({"mean": data.mean(axis=0), "time": time})
+
+    def get_dataframe(self) -> pd.DataFrame:
+        return self.df
+
+    def create_dataframe(self, data: np.ndarray, time: np.ndarray, kpi_name: str, axis) -> pd.DataFrame:
+        kpi = KPIs(data, axis=axis, kpi=KPIsConstants[kpi_name])
+        return pd.DataFrame({kpi_name: kpi.get_kpi(), "time": time})
 
     def parse_formula(self, formula: str) -> str:
         """
