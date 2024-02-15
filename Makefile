@@ -38,9 +38,10 @@ test-run:
     --end_date "2022-01-01" \
     --interval_type "weeks" \
     --date_interval 1 \
-		--name_id "islamayor_ndvi_" \
+		--name_id "islamayor_ndvi" \
 		--download \
 		--train \
+		--models "random_forest" "arima" \
 		$(ARGS)
 
 test-download:
@@ -53,7 +54,7 @@ test-download:
 		--end_date "2022-01-01" \
 		--interval_type "weeks" \
 		--date_interval 1 \
-		--name_id "islamayor_ndvi_" \
+		--name_id "islamayor_ndvi" \
 		--download \
 		$(ARGS)
 
@@ -64,6 +65,8 @@ test-train:
 		--start_date "2017-01-01" \
 		--interval_type "weeks" \
 		--date_interval 1 \
+		--name_id "islamayor_ndvi" \
+		--models "random_forest" "arima" \
 		--train \
 		$(ARGS)
 
