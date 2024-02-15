@@ -3,7 +3,7 @@
 ** [x] Scripts para descargar imágenes de Sentinel-2
 ** [x] Usar Copernicus en lugar de Sentinel
 ** (x) Estudiar APIs de Copernicus y Sentinel. ¿Qué se puede hacer con ellas?
-   - ( ) openEO librería Python
+   - (_) openEO librería Python
    - (x) API REST de Copernicus
 ** [x] Buscar cultivos en España sobre los que trabajar
    - [x] Arroz: Isla Mayor, Sevilla
