@@ -20,7 +20,52 @@ clean:
 # Additional targets can be added based on project needs
 
 run:
-	cd app && pwd && python -m main
+	cd app && pwd && python -m main $(ARGS)
+
+download:
+	cd app && pwd && python -m main --download $(ARGS)
+
+train:
+	cd app && pwd && python -m main --train $(ARGS)
+
+test-run:
+	cd app && pwd && python -m main \
+		--bands "B04" "B08" \
+    --formula "NDVI" \
+    --bbox -6.215864855019264 37.162534357525814 -6.111682075391747 37.10259292740977 \
+    --evalscript "ndvi" \
+    --start_date "2017-01-01" \
+    --end_date "2022-01-01" \
+    --interval_type "weeks" \
+    --date_interval 1 \
+		--name_id "islamayor_ndvi_" \
+		--download \
+		--train \
+		$(ARGS)
+
+test-download:
+	cd app && pwd && python -m main \
+		--bands "B04" "B08" \
+		--formula "NDVI" \
+		--bbox -6.215864855019264 37.162534357525814 -6.111682075391747 37.10259292740977 \
+		--evalscript "ndvi" \
+		--start_date "2017-01-01" \
+		--end_date "2022-01-01" \
+		--interval_type "weeks" \
+		--date_interval 1 \
+		--name_id "islamayor_ndvi_" \
+		--download \
+		$(ARGS)
+
+test-train:
+	cd app && pwd && python -m main \
+		--bands "B04" "B08" \
+		--formula "NDVI" \
+		--start_date "2017-01-01" \
+		--interval_type "weeks" \
+		--date_interval 1 \
+		--train \
+		$(ARGS)
 
 venv:
 	virtualenv TFG

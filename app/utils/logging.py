@@ -27,3 +27,5 @@ def set_logging():
 
     # Set root logger level
     logger.setLevel(logging.INFO)
+
+    logging.getLogger("rasterio").setLevel(logging.ERROR)

@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 
 
 class RandomForestModel(Model):
-    def __init__(self, date_interval: relativedelta, start_date: datetime, band_names: list, formula: str):
-        super().__init__(date_interval, start_date, band_names, formula)
+    def __init__(self, date_interval: relativedelta, start_date: datetime, band_names: list, formula: str, kpi: str):
+        super().__init__(date_interval, start_date, band_names, formula, kpi)
 
     def train_model(self) -> None:
         logger.info("Training {}...".format(self.__class__.__name__))
@@ -26,14 +26,19 @@ class RandomForestModel(Model):
         self.train, self.test = train_test_split(df, test_size=0.2, shuffle=False)
         self.train: list = self.train
         logger.info("Train: \n{}".format(self.train))
-        self.model = RandomForestRegressor(n_estimators=100)
+        model = RandomForestRegressor(n_estimators=100)
         # self.model.fit(self.train, self.train["mean"])
-        self.model.fit(self.train, self.train["mean"])
+        self.model_fit = model.fit(self.train, self.train[self.kpi])
 
         logger.info("Training complete.")
 
     def evaluate(self):
-        self.predictions = self.model.predict(self.test)
-        self.errors = mean_squared_error(self.test["mean"], self.predictions)
+        predictions = self.model_fit.predict(self.test)
+        errors = mean_squared_error(self.test[self.kpi], predictions)
+        score = self.model_fit.score(self.test, predictions)
 
-        logger.info("Mean Squared Error: {}".format(self.errors))
+        logger.info("Score: {}".format(score))
+        logger.info("Mean Squared Error: {}".format(errors))
+
+    def save_model(self):
+        pass

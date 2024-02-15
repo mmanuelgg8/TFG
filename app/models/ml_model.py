@@ -3,13 +3,14 @@ from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+import warnings
 
 import numpy as np
 import pandas as pd
 import rasterio
 from dotenv import load_dotenv
 from matplotlib.dates import relativedelta
-from scripts.kpis import KPIs, KPIsConstants
+from scripts.kpis import KPIs, parse_to_constant_kpi
 
 from configuration.configuration import Configuration
 from utils import set_logging
@@ -34,31 +35,30 @@ class Model:
     geotiffs_path = str(config["geotiffs_path"])
 
     def __init__(
-        self,
-        date_interval: relativedelta,
-        start_date: datetime,
-        band_names: List[str],
-        formula: str,
+        self, date_interval: relativedelta, start_date: datetime, band_names: List[str], formula: str, kpi: str
     ):
         tifs, time = self.tifs_to_array(start_date, date_interval)
         bands: List[Dict[str, List[Any]]] = self.extract_bands_from_tifs(band_names, tifs)
+        self.kpi = kpi
 
-        logger.info("Band names: {}".format(band_names))
-        logger.info("Bands: {}".format(bands))
+        # logger.info("Bands: {}".format(bands))
 
         data: np.ndarray = self.get_data(self.parse_formula(formula), bands)
 
         logger.info("Data shape: {}".format(data.shape))
-        logger.info("Data: {}".format(data))
+        # logger.info("Data: {}".format(data))
 
-        self.df: pd.DataFrame = self.create_dataframe(data, time, KPIsConstants.MEAN, axis=(1, 2))
+        self.df: pd.DataFrame = self.create_dataframe(data, time, kpi, axis=(1, 2))
 
     def get_dataframe(self) -> pd.DataFrame:
+        """Get the dataframe of the model"""
         return self.df
 
     def create_dataframe(self, data: np.ndarray, time: np.ndarray, kpi_name, axis) -> pd.DataFrame:
-        kpi = KPIs(data, axis=axis, kpi=kpi_name)
-        return pd.DataFrame({kpi_name.value: kpi.get_kpi(), "time": time})
+        """Create a dataframe from the data"""
+        kpi_constant = parse_to_constant_kpi(kpi_name)
+        kpi = KPIs(data, axis=axis, kpi=kpi_constant)
+        return pd.DataFrame({kpi_constant.value: kpi.get_kpi(), "time": time})
 
     def parse_formula(self, formula: str) -> str:
         """
@@ -82,7 +82,9 @@ class Model:
         the result is (band8 - band4) / (band8 + band4)
         """
 
-        return eval(formula, bands)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            return eval(formula, bands)
 
     def extract_bands_from_tifs(self, band_names, tifs) -> List[Dict[str, List[Any]]]:
         """
@@ -144,6 +146,6 @@ class Model:
 
     def visualize(self) -> None: ...
 
-    def save(self) -> None: ...
+    def save_model(self) -> None: ...
 
-    def load(self) -> None: ...
+    def load_model(self) -> None: ...

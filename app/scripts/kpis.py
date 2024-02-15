@@ -9,6 +9,13 @@ class KPIsConstants(Enum):
     STD = "std"
 
 
+def parse_to_constant_kpi(kpi: str) -> KPIsConstants:
+    try:
+        return KPIsConstants(kpi)
+    except ValueError:
+        return KPIsConstants.MEAN
+
+
 class KPIs:
     def __init__(self, data, axis, kpi: KPIsConstants):
         self.data = data
