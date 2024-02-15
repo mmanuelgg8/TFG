@@ -1,5 +1,5 @@
-import logging
 import argparse
+import logging
 from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 def main():
+    available_models = ["arima", "random_forest"]
     parser = argparse.ArgumentParser(description="Download and train models")
     parser.add_argument("--bbox", type=float, nargs=4, help="Bounding box coordinates")
     parser.add_argument("--evalscript", type=str, help="Evalscript")
@@ -26,6 +27,7 @@ def main():
     parser.add_argument("--kpi", choices=["mean", "max", "min", "std"], default="mean", help="KPI")
     parser.add_argument("--download", action="store_true", help="Download")
     parser.add_argument("--train", action="store_true", help="Train")
+    parser.add_argument("--models", choices=available_models, nargs="+", help="Models to train")
     args = parser.parse_args()
 
     if args.interval_type == "months":
@@ -39,38 +41,22 @@ def main():
 
     if args.train:
         logger.info("Training models...")
-        arima = ArimaModel(args.date_interval, args.start_date, args.bands, args.formula, args.kpi)
-        random_forest = RandomForestModel(args.date_interval, args.start_date, args.bands, args.formula, args.kpi)
-        arima.train_model()
-        random_forest.train_model()
-        arima.evaluate()
-        random_forest.evaluate()
+        models = []
+        for model in args.models:
+            if model == "arima":
+                models.append(
+                    ArimaModel(args.name_id, args.date_interval, args.start_date, args.bands, args.formula, args.kpi)
+                )
+            elif model == "random_forest":
+                models.append(
+                    RandomForestModel(
+                        args.name_id, args.date_interval, args.start_date, args.bands, args.formula, args.kpi
+                    )
+                )
+        for model in models:
+            model.train_model()
+            model.evaluate()
 
 
 if __name__ == "__main__":
     main()
-    # Isla Mayor, Sevilla
-    # bands = ["B04", "B08"]
-    # logger.info("Bands: {}".format(bands))
-    # formula = "NDVI"
-    # min_x, min_y = -6.215864855019264, 37.162534357525814
-    # max_x, max_y = -6.111682075391747, 37.10259292740977
-    # bbox = [min_x, min_y, max_x, max_y]
-    # evalscript = "ndvi"
-    # start_date = datetime(2017, 1, 1)
-    # # start_date = datetime(2021, 1, 1)
-    # end_date = datetime(2022, 1, 1)
-    # date_interval = relativedelta(weeks=1)
-    # name_id = "islamayor_ndvi_"
-    # # logger.info("Downloading images...")
-    # download(bbox, evalscript, start_date, end_date, date_interval, name_id)
-
-    # logger.info("Training models...")
-    # arima = ArimaModel(date_interval, start_date, bands, formula)
-    # random_forest = RandomForestModel(date_interval, start_date, bands, formula)
-    #
-    # arima.train_model()
-    # random_forest.train_model()
-    #
-    # arima.evaluate()
-    # random_forest.evaluate()

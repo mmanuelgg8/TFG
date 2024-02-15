@@ -1,4 +1,5 @@
 import logging
+import os
 from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, Generator
@@ -118,7 +119,7 @@ class Downloader:
         }
         return payload
 
-    def download(self, url: str, payload: Dict[str, Any], image_name: str) -> None:
+    def download(self, url: str, payload: Dict[str, Any], folder: str, image_name: str) -> None:
         oauth = self.oauth()
         resp = oauth.post(url, json=payload)
         error = resp.status_code != 200
@@ -128,14 +129,14 @@ class Downloader:
             logger.error(resp.content)
 
         format = payload["output"]["responses"][0]["format"]["type"]
-        image_path = self.get_image_path(format, image_name, error)
+        image_path = self.get_image_path(format, folder, image_name, error)
 
         with open(image_path, "wb") as f:
             f.write(resp.content if not error else b"")
 
         logger.info(f"Image {image_path} downloaded")
 
-    def get_image_path(self, format: str, image_name: str, error: bool) -> str:
+    def get_image_path(self, format: str, folder: str, image_name: str, error: bool) -> str:
         path = ""
         file_extension = ""
 
@@ -150,6 +151,11 @@ class Downloader:
             file_extension = ".jpg"
 
         error_suffix = "-error" if error else ""
+        path = path + folder
+        if not os.path.exists(path):
+            os.makedirs(path)
+            logger.info(f"Directory {path} created")
+        path = path if path.endswith("/") else path + "/"
         return f"{path}{image_name}{file_extension}{error_suffix}"
 
     # def daterange(self, start_date: datetime, end_date: datetime, step: int = 1):

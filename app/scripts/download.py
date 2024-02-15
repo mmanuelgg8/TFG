@@ -56,5 +56,5 @@ def download(
             }
         ]
         payload = downloader.create_payload(bbox, data, ImageFormatConstants.TIFF.value, evalscript)
-        name = name_id + date_start.strftime("%Y-%m-%d") + "_" + date_end.strftime("%Y-%m-%d")
-        downloader.download(url, payload, name)
+        name = date_start.strftime("%Y-%m-%d") + "_" + date_end.strftime("%Y-%m-%d")
+        downloader.download(url, payload, name_id, name)

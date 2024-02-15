@@ -1,18 +1,17 @@
 import logging
+import warnings
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
-import warnings
 
 import numpy as np
 import pandas as pd
 import rasterio
+from configuration.configuration import Configuration
 from dotenv import load_dotenv
 from matplotlib.dates import relativedelta
 from scripts.kpis import KPIs, parse_to_constant_kpi
-
-from configuration.configuration import Configuration
 from utils import set_logging
 
 load_dotenv()
@@ -35,9 +34,16 @@ class Model:
     geotiffs_path = str(config["geotiffs_path"])
 
     def __init__(
-        self, date_interval: relativedelta, start_date: datetime, band_names: List[str], formula: str, kpi: str
+        self,
+        name_id: str,
+        date_interval: relativedelta,
+        start_date: datetime,
+        band_names: List[str],
+        formula: str,
+        kpi: str,
     ):
-        tifs, time = self.tifs_to_array(start_date, date_interval)
+        logger.info("Name ID: {}".format(name_id))
+        tifs, time = self.tifs_to_array(name_id, start_date, date_interval)
         bands: List[Dict[str, List[Any]]] = self.extract_bands_from_tifs(band_names, tifs)
         self.kpi = kpi
 
@@ -108,7 +114,7 @@ class Model:
                 bands[band] = data[i]
         return bands
 
-    def tifs_to_array(self, start_date, date_interval) -> Tuple[np.ndarray, np.ndarray]:
+    def tifs_to_array(self, name_id, start_date, date_interval) -> Tuple[np.ndarray, np.ndarray]:
         """
         Convert the tifs to a numpy array and return the array and the time values
         """
@@ -116,7 +122,13 @@ class Model:
         time_values = []
         current_date = start_date
 
-        for tif in sorted(Path(self.geotiffs_path).iterdir()):
+        # path to geotiffs folder union the name_id
+        tifs_dir: Path = Path(self.geotiffs_path)
+        dir: Path = tifs_dir.joinpath(name_id)
+        if not dir.exists():
+            raise FileNotFoundError(f"Directory {dir} does not exist")
+
+        for tif in sorted(dir.iterdir()):
             if not tif.name.endswith(".xml"):
                 # Calculate the current date
                 current_date += date_interval
