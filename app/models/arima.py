@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 
 class ArimaModel(Model):
 
-    def __init__(self, geotiffs_paths: str, date_interval: relativedelta, start_date: datetime):
-        super().__init__(geotiffs_paths, date_interval, start_date)
+    def __init__(self, date_interval: relativedelta, start_date: datetime, band_names: list, formula: str):
+        super().__init__(date_interval, start_date, band_names, formula)
 
     def train_model(self) -> None:
         logger.info("Training {}...".format(self.__class__.__name__))

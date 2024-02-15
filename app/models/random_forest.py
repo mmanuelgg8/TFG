@@ -24,8 +24,10 @@ class RandomForestModel(Model):
         df = self.get_dataframe()
         # Train the model on the mean over time
         self.train, self.test = train_test_split(df, test_size=0.2, shuffle=False)
+        self.train: list = self.train
         logger.info("Train: \n{}".format(self.train))
         self.model = RandomForestRegressor(n_estimators=100)
+        # self.model.fit(self.train, self.train["mean"])
         self.model.fit(self.train, self.train["mean"])
 
         logger.info("Training complete.")
