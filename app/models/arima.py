@@ -1,12 +1,11 @@
 import logging
-from datetime import datetime
 
 from dotenv import load_dotenv
-from matplotlib.dates import relativedelta
-from models.ml_model import Model
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from statsmodels.tsa.arima.model import ARIMA, ARIMAResults
+
+from models.ml_model import Model
 from utils import set_logging
 
 load_dotenv()
@@ -16,10 +15,8 @@ logger = logging.getLogger(__name__)
 
 class ArimaModel(Model):
 
-    def __init__(
-        self, name_id: str, date_interval: relativedelta, start_date: datetime, band_names: list, formula: str, kpi: str
-    ):
-        super().__init__(name_id, date_interval, start_date, band_names, formula, kpi)
+    def __init__(self, df, kpi):
+        super().__init__(df, kpi)
 
     def train_model(self) -> None:
         logger.info("Training {}...".format(self.__class__.__name__))

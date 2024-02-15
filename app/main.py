@@ -3,6 +3,7 @@ import logging
 from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
+from utils.process_data import ProcessData
 from models.arima import ArimaModel
 from models.random_forest import RandomForestModel
 from scripts.download import download
@@ -41,18 +42,14 @@ def main():
 
     if args.train:
         logger.info("Training models...")
+        process_data = ProcessData(args.name_id, args.date_interval, args.start_date, args.bands, args.formula)
+        df = process_data.create_dataframe(args.kpi)
         models = []
         for model in args.models:
             if model == "arima":
-                models.append(
-                    ArimaModel(args.name_id, args.date_interval, args.start_date, args.bands, args.formula, args.kpi)
-                )
+                models.append(ArimaModel(df, args.kpi))
             elif model == "random_forest":
-                models.append(
-                    RandomForestModel(
-                        args.name_id, args.date_interval, args.start_date, args.bands, args.formula, args.kpi
-                    )
-                )
+                models.append(RandomForestModel(df, args.kpi))
         for model in models:
             model.train_model()
             model.evaluate()
