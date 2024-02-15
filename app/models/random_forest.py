@@ -21,7 +21,8 @@ class RandomForestModel(Model):
         logger.info("Training {}...".format(self.__class__.__name__))
         self.train, self.test = train_test_split(self.df, test_size=0.2, shuffle=False)
         self.train: list = self.train
-        logger.info("Train: \n{}".format(self.train))
+        # logger.info("Train: \n{}".format(self.train))
+        # logger.info("Test: \n{}".format(self.test))
         model = RandomForestRegressor(n_estimators=100)
         self.model_fit = model.fit(self.train, self.train[self.kpi])
 

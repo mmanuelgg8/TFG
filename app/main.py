@@ -44,6 +44,7 @@ def main():
         logger.info("Training models...")
         process_data = ProcessData(args.name_id, args.date_interval, args.start_date, args.bands, args.formula)
         df = process_data.create_dataframe(args.kpi)
+        logger.info("Dataframe: \n{}".format(df))
         models = []
         for model in args.models:
             if model == "arima":
