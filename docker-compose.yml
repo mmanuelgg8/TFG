@@ -1,0 +1,12 @@
+version: "2"
+
+services:
+  image-pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tfg
+    hostname: manu
+    volumes:
+      - ./data:/root/data
+      - ./resources:/root/resources
