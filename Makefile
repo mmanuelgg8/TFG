@@ -19,6 +19,12 @@ clean:
 
 # Additional targets can be added based on project needs
 
+build-image:
+	docker build --no-cache -t tfg .
+
+run-image:
+	docker run -it -v resources:/root/resources tfg python main.py -c $(FILE)
+
 run:
 	cd app && pwd && python -m main $(ARGS)
 

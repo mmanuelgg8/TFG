@@ -158,10 +158,6 @@ class Downloader:
         path = path if path.endswith("/") else path + "/"
         return f"{path}{image_name}{file_extension}{error_suffix}"
 
-    # def daterange(self, start_date: datetime, end_date: datetime, step: int = 1):
-    #     for n in range(int((end_date - start_date).days / step)):
-    #         yield start_date + timedelta(n * step)
-
     def daterange(
         self, start_date: datetime, end_date: datetime, step: relativedelta = relativedelta(days=1)
     ) -> Generator[datetime, None, None]:
