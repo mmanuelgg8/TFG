@@ -23,6 +23,4 @@ COPY .env /root/app/.env
 COPY resources /root/resources
 COPY data /root/data
 
-VOLUME /root/resources
-
 # CMD ["python", "main.py"]
