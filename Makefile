@@ -1,5 +1,5 @@
 # Makefile for a Python project
-IMAGE_NAME = tfg
+IMAGE_NAME = tfg-image-pipeline
 
 .PHONY: clean install test
 
@@ -22,7 +22,7 @@ build-image:
 	@echo y | docker image prune
 
 run-image:
-	docker run -it -v resources:/root/resources tfg python main.py -c $(FILE)
+	docker run -it -v resources:/root/resources $(IMAGE_NAME) python main.py -c $(FILE)
 
 run:
 	cd app && pwd && python -m main $(ARGS)
