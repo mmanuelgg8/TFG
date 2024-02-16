@@ -1,0 +1,15 @@
+{
+  "bbox": [15.959, 48.683, 16.002, 48.71],
+  "evalscript": "ndvi",
+  "start_date": "2017-01-01",
+  "end_date": "2022-01-01",
+  "date_interval": 1,
+  "interval_type": "weeks",
+  "name_id": "isla_mayor_ndvi",
+  "bands": ["B04", "B08"],
+  "formula": "NDVI",
+  "kpi": "mean",
+  "download": true,
+  "train": false,
+  "models": ["arima", "random_forest"]
+}
