@@ -27,14 +27,14 @@ def main(config_file):
     with open(config_file, "r") as f:
         config = json.load(f)
 
-    download = config.get("download")
-    if download.get("enabled"):
+    download_config = config.get("download")
+    if download_config.get("enabled"):
         logger.info("Downloading images...")
-        start_date = datetime.strptime(download.get("start_date"), "%Y-%m-%d")
-        end_date = datetime.strptime(download.get("end_date"), "%Y-%m-%d")
+        start_date = datetime.strptime(download_config.get("start_date"), "%Y-%m-%d")
+        end_date = datetime.strptime(download_config.get("end_date"), "%Y-%m-%d")
         logger.info("Dates: {} - {}".format(start_date, end_date))
-        interval_type = download.get("interval_type", "weeks")
-        date_interval = download.get("date_interval", 1)
+        interval_type = download_config.get("interval_type", "weeks")
+        date_interval = download_config.get("date_interval", 1)
         download(
             config["bbox"],
             config["evalscript"],
@@ -44,12 +44,12 @@ def main(config_file):
             config["name_id"],
         )
 
-    train = config.get("train")
-    if train.get("enabled"):
+    train_config = config.get("train")
+    if train_config.get("enabled"):
         logger.info("Training models...")
-        start_date = datetime.strptime(train.get("start_date"), "%Y-%m-%d")
-        interval_type = train.get("interval_type", "weeks")
-        date_interval = train.get("date_interval", 1)
+        start_date = datetime.strptime(train_config.get("start_date"), "%Y-%m-%d")
+        interval_type = train_config.get("interval_type", "weeks")
+        date_interval = train_config.get("date_interval", 1)
         process_data = ProcessData(
             config["name_id"],
             parse_date_interval(interval_type, date_interval),
@@ -57,14 +57,14 @@ def main(config_file):
             config["bands"],
             config["formula"],
         )
-        df = process_data.create_dataframe(train.get("kpi"))
+        df = process_data.create_dataframe(train_config.get("kpi"))
         logger.info("Dataframe: \n{}".format(df))
         models = []
         for model in config["models"]:
             if model == "arima":
-                models.append(ArimaModel(df, train.get("kpi")))
+                models.append(ArimaModel(df, train_config.get("kpi")))
             elif model == "random_forest":
-                models.append(RandomForestModel(df, train.get("kpi")))
+                models.append(RandomForestModel(df, train_config.get("kpi")))
         for model in models:
             model.train_model()
             model.evaluate()
