@@ -1,11 +1,11 @@
 import logging
 
 from dotenv import load_dotenv
+from matplotlib import pyplot as plt
+from models.ml_model import Model
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
-
-from models.ml_model import Model
 from utils import set_logging
 
 load_dotenv()
@@ -36,5 +36,8 @@ class RandomForestModel(Model):
         logger.info("Score: {}".format(score))
         logger.info("Mean Squared Error: {}".format(errors))
 
-    def save_model(self):
-        pass
+    def save_visualization(self, path: str) -> None:
+        plt.plot(self.train[self.kpi])
+        plt.plot(self.test[self.kpi])
+        plt.plot(self.test.index, self.model_fit.predict(self.test))
+        plt.savefig(path)
