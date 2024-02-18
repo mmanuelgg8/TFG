@@ -27,6 +27,7 @@ def main(config_file):
     with open(config_file, "r") as f:
         config = json.load(f)
 
+    name_id = config.get("name_id")
     download_config = config.get("download")
     if download_config.get("enabled"):
         logger.info("Downloading images...")
@@ -36,12 +37,12 @@ def main(config_file):
         interval_type = download_config.get("interval_type", "weeks")
         date_interval = download_config.get("date_interval", 1)
         download(
-            config["bbox"],
-            config["evalscript"],
-            start_date,
-            end_date,
-            parse_date_interval(interval_type, date_interval),
-            config["name_id"],
+            bbox=download_config.get("bbox"),
+            evalscript=download_config.get("evalscript"),
+            start_date=start_date,
+            end_date=end_date,
+            date_interval=parse_date_interval(interval_type, date_interval),
+            name_id=name_id,
         )
 
     train_config = config.get("train")
@@ -51,16 +52,16 @@ def main(config_file):
         interval_type = train_config.get("interval_type", "weeks")
         date_interval = train_config.get("date_interval", 1)
         process_data = ProcessData(
-            config["name_id"],
-            parse_date_interval(interval_type, date_interval),
-            start_date,
-            config["bands"],
-            config["formula"],
+            name_id=name_id,
+            date_interval=parse_date_interval(interval_type, date_interval),
+            start_date=start_date,
+            band_names=config.get("bands"),
+            formula=train_config.get("formula"),
         )
         df = process_data.create_dataframe(train_config.get("kpi"))
         logger.info("Dataframe: \n{}".format(df))
         models = []
-        for model in config["models"]:
+        for model in train_config.get("models"):
             if model == "arima":
                 models.append(ArimaModel(df, train_config.get("kpi")))
             elif model == "random_forest":
