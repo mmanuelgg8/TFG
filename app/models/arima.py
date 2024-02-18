@@ -35,8 +35,8 @@ class ArimaModel(Model):
         predictions_errors = mean_squared_error(self.test[self.kpi], predictions)
         forecast_errors = mean_squared_error(self.test[self.kpi], forecast)
 
-        logger.info("Mean Squared Error: {}".format(forecast_errors))
-        logger.info("Mean Squared Error: {}".format(predictions_errors))
+        logger.info("Mean Squared Forecast Error: {}".format(forecast_errors))
+        logger.info("Mean Squared Predictions Error: {}".format(predictions_errors))
 
     def predict(self, model_name: str) -> None:
         if self.model_fit is None:

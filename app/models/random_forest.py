@@ -1,6 +1,5 @@
 import logging
 
-import joblib
 from dotenv import load_dotenv
 from matplotlib import pyplot as plt
 from models.ml_model import Model
