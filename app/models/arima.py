@@ -1,11 +1,11 @@
 import logging
 
 from dotenv import load_dotenv
+from matplotlib import pyplot as plt
+from models.ml_model import Model
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from statsmodels.tsa.arima.model import ARIMA, ARIMAResults
-
-from models.ml_model import Model
 from utils import set_logging
 
 load_dotenv()
@@ -34,3 +34,9 @@ class ArimaModel(Model):
         errors = mean_squared_error(self.test[self.kpi], predictions)
 
         logger.info("Mean Squared Error: {}".format(errors))
+
+    def save_visualization(self, path: str) -> None:
+        plt.plot(self.train[self.kpi])
+        plt.plot(self.test[self.kpi])
+        plt.plot(self.test.index, self.model_fit.forecast(steps=len(self.test)))
+        plt.savefig(path)
