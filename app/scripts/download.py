@@ -40,8 +40,8 @@ def download(
     print(evalscript)
 
     for single_date in downloader.daterange(start_date, end_date, step=date_interval):
-        date_start = single_date
-        date_end = single_date + date_interval
+        date_start: datetime = single_date
+        date_end: datetime = single_date + date_interval
         data = [
             {
                 "type": type,
