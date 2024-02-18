@@ -1,9 +1,9 @@
 import logging
 import pickle
+from typing import Any
 
 import joblib
 from dotenv import load_dotenv
-from statsmodels.tsa.arima.model import ARIMA, ARIMAResults
 from utils import set_logging
 
 load_dotenv()
@@ -26,12 +26,22 @@ class Model:
 
     def visualize(self) -> None: ...
 
+    def save_visualization(self, path: str) -> None: ...
+
     def save_model(self, model_name: str) -> None:
         if not model_name.endswith(".sav"):
             raise RuntimeError("Filename should end with '.sav'")
         # pickle.dump(self.model_fit, open(model_name, "wb"))
+        self.model_name = model_name
         joblib.dump(self.model_fit, model_name)
 
-    def load_model(self, model_name: str) -> ARIMAResults:
+    def load_model(self, model_name: str) -> Any:
         # return pickle.load(open(model_name, "rb"))
+        if not model_name.endswith(".sav"):
+            raise RuntimeError("Filename should end with '.sav'")
+        if model_name is None:
+            if self.model_name is None:
+                raise RuntimeError("Model name not found")
+            model_name = self.model_name
+
         return joblib.load(model_name)

@@ -1,5 +1,6 @@
 import logging
 
+import joblib
 from dotenv import load_dotenv
 from matplotlib import pyplot as plt
 from models.ml_model import Model
@@ -35,6 +36,19 @@ class RandomForestModel(Model):
 
         logger.info("Score: {}".format(score))
         logger.info("Mean Squared Error: {}".format(errors))
+
+    def predict(self, model_name: str) -> None:
+        if self.model_fit is None:
+            try:
+                if self.model_name:
+                    self.model_fit = self.load_model(self.model_name)
+                if model_name:
+                    self.model_fit = self.load_model(model_name)
+            except Exception as e:
+                logger.error("Error loading model")
+                raise e
+        predictions = self.model_fit.predict(self.test)
+        logger.info("Predictions: {}".format(predictions))
 
     def save_visualization(self, path: str) -> None:
         plt.plot(self.train[self.kpi])

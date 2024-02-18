@@ -10,6 +10,37 @@
   "formula": "NDVI",
   "kpi": "mean",
   "download": true,
-  "train": true,
-  "models": ["arima", "random_forest"]
+  "models": ["arima", "random_forest"],
+  "model_params": {
+    "arima": {
+      "p": 2,
+      "d": 1,
+      "q": 2
+    },
+    "random_forest": {
+      "n_estimators": 100,
+      "max_depth": 10
+    }
+  },
+  "train_start_date": "2017-01-01",
+  "train_end_date": "2020-01-01",
+  "train": {
+    "enabled": true,
+    "start_date": "2017-01-01",
+    "end_date": "2020-01-01",
+    "kpi": "mean",
+    "models": ["arima", "random_forest"],
+    "model_params": {
+      "arima": {
+        "p": 2,
+        "d": 1,
+        "q": 2
+      },
+      "random_forest": {
+        "n_estimators": 100,
+        "max_depth": 10
+      }
+    }
+  }
+  
 }

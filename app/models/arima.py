@@ -30,10 +30,28 @@ class ArimaModel(Model):
         logger.info("Training complete.")
 
     def evaluate(self):
-        predictions = self.model_fit.forecast(steps=len(self.test))
-        errors = mean_squared_error(self.test[self.kpi], predictions)
+        predictions = self.model_fit.predict(start=self.test.index[0], end=self.test.index[-1])
+        forecast = self.model_fit.forecast(steps=len(self.test))
+        predictions_errors = mean_squared_error(self.test[self.kpi], predictions)
+        forecast_errors = mean_squared_error(self.test[self.kpi], forecast)
 
-        logger.info("Mean Squared Error: {}".format(errors))
+        logger.info("Mean Squared Error: {}".format(forecast_errors))
+        logger.info("Mean Squared Error: {}".format(predictions_errors))
+
+    def predict(self, model_name: str) -> None:
+        if self.model_fit is None:
+            try:
+                if self.model_name:
+                    self.model_fit = self.load_model(self.model_name)
+                if model_name:
+                    self.model_fit = self.load_model(model_name)
+            except Exception as e:
+                logger.error("Error loading model")
+                raise e
+        predictions = self.model_fit.predict(self.test)
+        forecast = self.model_fit.forecast(steps=len(self.test))
+        logger.info("Predictions: {}".format(predictions))
+        logger.info("Forecast: {}".format(forecast))
 
     def save_visualization(self, path: str) -> None:
         plt.plot(self.train[self.kpi])

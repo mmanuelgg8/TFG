@@ -5,7 +5,6 @@ import os
 from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
-
 from models.arima import ArimaModel
 from models.random_forest import RandomForestModel
 from scripts.download import download
@@ -42,7 +41,7 @@ def main(config_file):
             config["name_id"],
         )
 
-    if config.get("train"):
+    if config.get("train").get("enabled"):
         logger.info("Training models...")
         process_data = ProcessData(config["name_id"], date_interval, start_date, config["bands"], config["formula"])
         df = process_data.create_dataframe(config["kpi"])
