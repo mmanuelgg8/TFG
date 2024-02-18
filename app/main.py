@@ -15,43 +15,56 @@ set_logging()
 logger = logging.getLogger(__name__)
 
 
-def main(config_file):
-    with open(config_file, "r") as f:
-        config = json.load(f)
-
-    start_date = datetime.strptime(config["start_date"], "%Y-%m-%d")
-    end_date = datetime.strptime(config["end_date"], "%Y-%m-%d")
-    interval_type = config.get("interval_type", "weeks")
-    date_interval = config.get("date_interval", 1)
-
+def parse_date_interval(interval_type, date_interval) -> relativedelta:
     if interval_type == "months":
         date_interval = relativedelta(months=date_interval)
     elif interval_type == "weeks":
         date_interval = relativedelta(weeks=date_interval)
+    return date_interval
 
-    if config.get("download"):
+
+def main(config_file):
+    with open(config_file, "r") as f:
+        config = json.load(f)
+
+    download = config.get("download")
+    if download.get("enabled"):
         logger.info("Downloading images...")
+        start_date = datetime.strptime(download.get("start_date"), "%Y-%m-%d")
+        end_date = datetime.strptime(download.get("end_date"), "%Y-%m-%d")
         logger.info("Dates: {} - {}".format(start_date, end_date))
+        interval_type = download.get("interval_type", "weeks")
+        date_interval = download.get("date_interval", 1)
         download(
             config["bbox"],
             config["evalscript"],
             start_date,
             end_date,
-            date_interval,
+            parse_date_interval(interval_type, date_interval),
             config["name_id"],
         )
 
-    if config.get("train").get("enabled"):
+    train = config.get("train")
+    if train.get("enabled"):
         logger.info("Training models...")
-        process_data = ProcessData(config["name_id"], date_interval, start_date, config["bands"], config["formula"])
-        df = process_data.create_dataframe(config["kpi"])
+        start_date = datetime.strptime(train.get("start_date"), "%Y-%m-%d")
+        interval_type = train.get("interval_type", "weeks")
+        date_interval = train.get("date_interval", 1)
+        process_data = ProcessData(
+            config["name_id"],
+            parse_date_interval(interval_type, date_interval),
+            start_date,
+            config["bands"],
+            config["formula"],
+        )
+        df = process_data.create_dataframe(train.get("kpi"))
         logger.info("Dataframe: \n{}".format(df))
         models = []
         for model in config["models"]:
             if model == "arima":
-                models.append(ArimaModel(df, config["kpi"]))
+                models.append(ArimaModel(df, train.get("kpi")))
             elif model == "random_forest":
-                models.append(RandomForestModel(df, config["kpi"]))
+                models.append(RandomForestModel(df, train.get("kpi")))
         for model in models:
             model.train_model()
             model.evaluate()

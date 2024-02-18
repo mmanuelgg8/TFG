@@ -8,33 +8,31 @@
   "name_id": "isla_mayor_ndvi",
   "bands": ["B04", "B08"],
   "formula": "NDVI",
-  "kpi": "mean",
-  "download": true,
-  "models": ["arima", "random_forest"],
-  "model_params": {
-    "arima": {
-      "p": 2,
-      "d": 1,
-      "q": 2
-    },
-    "random_forest": {
-      "n_estimators": 100,
-      "max_depth": 10
-    }
+  "download": {
+    "enabled": true,
+    "bbox": [15.959, 48.683, 16.002, 48.71],
+    "start_date": "2017-01-01",
+    "end_date": "2020-01-01",
+    "date_interval": 1,
+    "interval_type": "weeks",
+    "bands": ["B04", "B08"],
+    "format": "tiff",
+    "evalscript": "ndvi"
   },
-  "train_start_date": "2017-01-01",
-  "train_end_date": "2020-01-01",
+  "models": ["arima", "random_forest"],
   "train": {
     "enabled": true,
     "start_date": "2017-01-01",
     "end_date": "2020-01-01",
+    "date_interval": 1,
+    "interval_type": "weeks",
     "kpi": "mean",
     "models": ["arima", "random_forest"],
     "model_params": {
       "arima": {
-        "p": 2,
+        "p": 5,
         "d": 1,
-        "q": 2
+        "q": 0
       },
       "random_forest": {
         "n_estimators": 100,
