@@ -10,6 +10,7 @@ from models.random_forest import RandomForestModel
 from scripts.download import download
 from utils import set_logging
 from utils.process_data import ProcessData
+from configuration.configuration import Configuration
 
 set_logging()
 logger = logging.getLogger(__name__)
@@ -24,6 +25,7 @@ def parse_date_interval(interval_type, date_interval) -> relativedelta:
 
 
 def main(config_file):
+    configuration = Configuration()
     with open(config_file, "r") as f:
         config = json.load(f)
 
@@ -69,6 +71,18 @@ def main(config_file):
         for model in models:
             model.train_model()
             model.evaluate()
+            models_path = str(configuration["models_path"])
+            if not os.path.exists(models_path):
+                os.makedirs(models_path)
+                logger.info(f"Directory {models_path} created")
+            model_path = os.path.join(models_path, f"{name_id}_{model.__class__.__name__}.sav")
+            model.save_model(model_path)
+            visualizations_path = str(configuration["visualizations_path"])
+            if not os.path.exists(visualizations_path):
+                os.makedirs(visualizations_path)
+                logger.info(f"Directory {visualizations_path} created")
+            visualization_path = os.path.join(visualizations_path, f"{name_id}_{model.__class__.__name__}.png")
+            model.save_visualization(visualization_path)
 
 
 if __name__ == "__main__":

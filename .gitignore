@@ -7,3 +7,5 @@ data/geotiffs/*
 data/mbtiles/*
 data/tmp/pngs/*
 data/tmp/tiles/*
+data/models/*
+data/visualizations/*

@@ -33,7 +33,7 @@ build-image-no-cache:
 # 	docker run -it -v resources:/root/resources $(IMAGE_NAME) python main.py -c $(FILE)
 
 run-image:
-	docker compose run $(IMAGE_NAME) python main.py -c "isla_mayor.json"
+	docker compose run $(IMAGE_NAME) python main.py -c $(FILE)
 
 image-ssh:
 	docker compose run $(IMAGE_NAME) /bin/bash
