@@ -46,10 +46,12 @@ class RandomForestModel(Model):
             except Exception as e:
                 logger.error("Error loading model")
                 raise e
+        self.train, self.test = train_test_split(self.df, test_size=0.2, shuffle=False)
         predictions = self.model_fit.predict(self.test)
         logger.info("Predictions: {}".format(predictions))
 
     def save_visualization(self, path: str, interval_type: str) -> None:
+        self.train, self.test = train_test_split(self.df, test_size=0.2, shuffle=False)
         plt.plot(self.train[self.kpi], color="blue")
         plt.plot(self.test[self.kpi], color="orange")
         predictions = self.model_fit.predict(self.test)

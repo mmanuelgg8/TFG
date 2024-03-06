@@ -14,9 +14,11 @@
   },
   "models": ["arima", "random_forest"],
   "train": {
-    "enabled": true,
+    "enabled": false,
+    "predict": false,
     "save_visualization": true,
     "save_model": true,
+    "load_model": true,
     "start_date": "2017-01-01",
     "end_date": "2020-01-01",
     "date_interval": 1,

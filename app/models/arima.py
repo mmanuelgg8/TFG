@@ -45,10 +45,12 @@ class ArimaModel(Model):
             except Exception as e:
                 logger.error("Error loading model")
                 raise e
+        self.train, self.test = train_test_split(self.df, test_size=0.2, shuffle=False)
         forecast = self.model_fit.forecast(steps=len(self.test))
         logger.info("Forecast: {}".format(forecast))
 
     def save_visualization(self, path: str, interval_type: str) -> None:
+        self.train, self.test = train_test_split(self.df, test_size=0.2, shuffle=False)
         plt.plot(self.train[self.kpi], color="blue")
         plt.plot(self.test[self.kpi], color="orange")
         forecast = self.model_fit.forecast(steps=len(self.test))

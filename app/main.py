@@ -48,7 +48,12 @@ def main(config_file):
         )
 
     train_config = config.get("train")
-    if train_config.get("enabled"):
+    if (
+        train_config.get("enabled")
+        or train_config.get("save_model")
+        or train_config.get("save_visualization")
+        or train_config.get("predict")
+    ):
         logger.info("Training models...")
         start_date = datetime.strptime(train_config.get("start_date"), "%Y-%m-%d")
         interval_type = train_config.get("interval_type", "weeks")
@@ -63,14 +68,15 @@ def main(config_file):
         df = process_data.create_dataframe(train_config.get("kpi"))
         logger.info("Dataframe: \n{}".format(df))
         models = []
-        for model in train_config.get("models"):
-            if model == "arima":
+        for model_name in train_config.get("models"):
+            if model_name == "arima":
                 models.append(ArimaModel(df, train_config.get("kpi")))
-            elif model == "random_forest":
+            elif model_name == "random_forest":
                 models.append(RandomForestModel(df, train_config.get("kpi")))
-        for model in models:
-            model.train_model()
-            model.evaluate()
+        if train_config.get("enabled"):
+            for model in models:
+                model.train_model()
+                model.evaluate()
             if train_config.get("save_model"):
                 models_path = str(configuration["models_path"])
                 if not os.path.exists(models_path):
@@ -78,11 +84,22 @@ def main(config_file):
                     logger.info(f"Directory {models_path} created")
                 model_path = os.path.join(models_path, f"{name_id}_{model.__class__.__name__}.sav")
                 model.save_model(model_path)
-            if train_config.get("save_visualization"):
-                visualizations_path = str(configuration["visualizations_path"])
-                if not os.path.exists(visualizations_path):
-                    os.makedirs(visualizations_path)
-                    logger.info(f"Directory {visualizations_path} created")
+        if train_config.get("load_model"):
+            models_path = str(configuration["models_path"])
+            if not os.path.exists(models_path):
+                raise FileNotFoundError(f"Directory {models_path} not found")
+            for model in models:
+                model_path = os.path.join(models_path, f"{name_id}_{model.__class__.__name__}.sav")
+                model.model_fit = model.load_model(model_path)
+        if train_config.get("predict"):
+            for model in models:
+                model.predict(train_config.get("model_name"))
+        if train_config.get("save_visualization"):
+            visualizations_path = str(configuration["visualizations_path"])
+            if not os.path.exists(visualizations_path):
+                os.makedirs(visualizations_path)
+                logger.info(f"Directory {visualizations_path} created")
+            for model in models:
                 visualization_path = os.path.join(visualizations_path, f"{name_id}_{model.__class__.__name__}.png")
                 if os.path.exists(visualization_path):
                     os.remove(visualization_path)
