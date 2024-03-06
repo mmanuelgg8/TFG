@@ -54,7 +54,7 @@ class ArimaModel(Model):
         forecast = self.model_fit.forecast(steps=len(self.test))
         off_set = len(self.train)
         plt.plot(range(off_set, off_set + len(forecast)), forecast, color="green")
-        plt.legend(["Train", "Test", "Forecast", "Predictions"])
+        plt.legend(["Train", "Test", "Forecast"])
         plt.title("ARIMA Model")
         plt.xlabel(f"Time ({interval_type})")
         plt.ylabel(self.kpi)
