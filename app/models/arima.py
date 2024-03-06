@@ -45,9 +45,7 @@ class ArimaModel(Model):
             except Exception as e:
                 logger.error("Error loading model")
                 raise e
-        predictions = self.model_fit.predict(self.test)
         forecast = self.model_fit.forecast(steps=len(self.test))
-        logger.info("Predictions: {}".format(predictions))
         logger.info("Forecast: {}".format(forecast))
 
     def save_visualization(self, path: str, interval_type: str) -> None:
