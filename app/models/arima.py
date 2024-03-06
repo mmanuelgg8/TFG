@@ -30,13 +30,10 @@ class ArimaModel(Model):
         logger.info("Training complete.")
 
     def evaluate(self):
-        predictions = self.model_fit.predict(start=self.test.index[0], end=self.test.index[-1])
         forecast = self.model_fit.forecast(steps=len(self.test))
-        predictions_errors = mean_squared_error(self.test[self.kpi], predictions)
         forecast_errors = mean_squared_error(self.test[self.kpi], forecast)
 
         logger.info("Mean Squared Forecast Error: {}".format(forecast_errors))
-        logger.info("Mean Squared Predictions Error: {}".format(predictions_errors))
 
     def predict(self, model_name: str) -> None:
         if self.model_fit is None:
@@ -56,10 +53,9 @@ class ArimaModel(Model):
     def save_visualization(self, path: str, interval_type: str) -> None:
         plt.plot(self.train[self.kpi], color="blue")
         plt.plot(self.test[self.kpi], color="orange")
-        plt.plot(self.model_fit.forecast(steps=len(self.test)), color="green")
-        plt.plot(
-            self.test.index, self.model_fit.predict(start=self.test.index[0], end=self.test.index[-1]), color="red"
-        )
+        forecast = self.model_fit.forecast(steps=len(self.test))
+        off_set = len(self.train)
+        plt.plot(range(off_set, off_set + len(forecast)), forecast, color="green")
         plt.legend(["Train", "Test", "Forecast", "Predictions"])
         plt.title("ARIMA Model")
         plt.xlabel(f"Time ({interval_type})")

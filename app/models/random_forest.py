@@ -52,7 +52,9 @@ class RandomForestModel(Model):
     def save_visualization(self, path: str, interval_type: str) -> None:
         plt.plot(self.train[self.kpi], color="blue")
         plt.plot(self.test[self.kpi], color="orange")
-        plt.plot(self.test.index, self.model_fit.predict(self.test), color="green")
+        predictions = self.model_fit.predict(self.test)
+        off_set = len(self.train)
+        plt.plot(range(off_set, off_set + len(predictions)), predictions, color="green")
         plt.legend(["Train", "Test", "Predictions"])
         plt.title("Random Forest Model")
         plt.xlabel(f"Time ({interval_type})")
