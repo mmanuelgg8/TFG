@@ -1,5 +1,6 @@
 import logging
-import pickle
+
+# import pickle
 from typing import Any
 
 import joblib
@@ -26,7 +27,7 @@ class Model:
 
     def visualize(self) -> None: ...
 
-    def save_visualization(self, path: str) -> None: ...
+    def save_visualization(self, path: str, interval_type: str) -> None: ...
 
     def save_model(self, model_name: str) -> None:
         if not model_name.endswith(".sav"):
@@ -34,6 +35,7 @@ class Model:
         # pickle.dump(self.model_fit, open(model_name, "wb"))
         self.model_name = model_name
         joblib.dump(self.model_fit, model_name)
+        logger.info(f"Model saved as {model_name}")
 
     def load_model(self, model_name: str) -> Any:
         # return pickle.load(open(model_name, "rb"))
@@ -44,4 +46,5 @@ class Model:
                 raise RuntimeError("Model name not found")
             model_name = self.model_name
 
+        logger.info(f"Loading model {model_name}")
         return joblib.load(model_name)

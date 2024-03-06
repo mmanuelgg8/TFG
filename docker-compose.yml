@@ -8,5 +8,6 @@ services:
     container_name: tfg
     hostname: manu
     volumes:
+      - ./app:/root/app
       - ./data:/root/data
       - ./resources:/root/resources

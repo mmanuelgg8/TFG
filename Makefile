@@ -22,21 +22,21 @@ clean:
 # 	@echo y | docker image prune
 
 build-image:
-	docker compose build
+	docker compose build $(IMAGE_NAME)
 	docker compose up
 
 build-image-no-cache:
-	docker compose build --no-cache
+	docker compose build --no-cache $(IMAGE_NAME)
 	docker compose up
 
 # run-image:
 # 	docker run -it -v resources:/root/resources $(IMAGE_NAME) python main.py -c $(FILE)
 
 run-image:
-	docker compose run $(IMAGE_NAME) python main.py -c $(FILE)
+	docker compose run --rm $(IMAGE_NAME) python main.py -c $(FILE)
 
 image-ssh:
-	docker compose run $(IMAGE_NAME) /bin/bash
+	docker compose run --rm $(IMAGE_NAME) /bin/bash
 
 run:
 	cd app && pwd && python -m main $(ARGS)

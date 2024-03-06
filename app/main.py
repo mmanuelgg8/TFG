@@ -71,18 +71,23 @@ def main(config_file):
         for model in models:
             model.train_model()
             model.evaluate()
-            models_path = str(configuration["models_path"])
-            if not os.path.exists(models_path):
-                os.makedirs(models_path)
-                logger.info(f"Directory {models_path} created")
-            model_path = os.path.join(models_path, f"{name_id}_{model.__class__.__name__}.sav")
-            model.save_model(model_path)
-            visualizations_path = str(configuration["visualizations_path"])
-            if not os.path.exists(visualizations_path):
-                os.makedirs(visualizations_path)
-                logger.info(f"Directory {visualizations_path} created")
-            visualization_path = os.path.join(visualizations_path, f"{name_id}_{model.__class__.__name__}.png")
-            model.save_visualization(visualization_path)
+            if train_config.get("save_model"):
+                models_path = str(configuration["models_path"])
+                if not os.path.exists(models_path):
+                    os.makedirs(models_path)
+                    logger.info(f"Directory {models_path} created")
+                model_path = os.path.join(models_path, f"{name_id}_{model.__class__.__name__}.sav")
+                model.save_model(model_path)
+            if train_config.get("save_visualization"):
+                visualizations_path = str(configuration["visualizations_path"])
+                if not os.path.exists(visualizations_path):
+                    os.makedirs(visualizations_path)
+                    logger.info(f"Directory {visualizations_path} created")
+                visualization_path = os.path.join(visualizations_path, f"{name_id}_{model.__class__.__name__}.png")
+                if os.path.exists(visualization_path):
+                    os.remove(visualization_path)
+                    logger.info(f"File {visualization_path} removed")
+                model.save_visualization(visualization_path, train_config.get("interval_type"))
 
 
 if __name__ == "__main__":

@@ -53,8 +53,16 @@ class ArimaModel(Model):
         logger.info("Predictions: {}".format(predictions))
         logger.info("Forecast: {}".format(forecast))
 
-    def save_visualization(self, path: str) -> None:
-        plt.plot(self.train[self.kpi])
-        plt.plot(self.test[self.kpi])
-        plt.plot(self.test.index, self.model_fit.forecast(steps=len(self.test)))
+    def save_visualization(self, path: str, interval_type: str) -> None:
+        plt.plot(self.train[self.kpi], color="blue")
+        plt.plot(self.test[self.kpi], color="orange")
+        plt.plot(self.model_fit.forecast(steps=len(self.test)), color="green")
+        plt.plot(
+            self.test.index, self.model_fit.predict(start=self.test.index[0], end=self.test.index[-1]), color="red"
+        )
+        plt.legend(["Train", "Test", "Forecast", "Predictions"])
+        plt.title("ARIMA Model")
+        plt.xlabel(f"Time ({interval_type})")
+        plt.ylabel(self.kpi)
         plt.savefig(path)
+        logger.info(f"Visualization saved as {path}")
