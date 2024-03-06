@@ -59,4 +59,5 @@ class ArimaModel(Model):
         plt.xlabel(f"Time ({interval_type})")
         plt.ylabel(self.kpi)
         plt.savefig(path)
+        plt.close()
         logger.info(f"Visualization saved as {path}")
