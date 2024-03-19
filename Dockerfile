@@ -19,7 +19,6 @@ RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 WORKDIR /root/app
 
 COPY app /root/app
-COPY .env /root/app/.env
 COPY resources /root/resources
 COPY data /root/data
 

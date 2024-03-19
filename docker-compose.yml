@@ -11,3 +11,5 @@ services:
       - ./app:/root/app
       - ./data:/root/data
       - ./resources:/root/resources
+    env_file:
+      - .env

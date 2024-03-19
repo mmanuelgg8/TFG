@@ -15,8 +15,9 @@ logger = logging.getLogger(__name__)
 
 class ArimaModel(Model):
 
-    def __init__(self, df, kpi):
+    def __init__(self, df, kpi, model_params):
         super().__init__(df, kpi)
+        self.model_params = model_params
 
     def train_model(self) -> None:
         logger.info("Training {}...".format(self.__class__.__name__))
@@ -24,7 +25,10 @@ class ArimaModel(Model):
         self.train, self.test = train_test_split(self.df, test_size=0.2, shuffle=False)
         # logger.info("Train: \n{}".format(self.train))
         # logger.info("Test: \n{}".format(self.test))
-        model: ARIMA = ARIMA(self.train[self.kpi], order=(5, 1, 0))
+        p = self.model_params.get("p", 5)
+        d = self.model_params.get("d", 1)
+        q = self.model_params.get("q", 0)
+        model: ARIMA = ARIMA(self.train[self.kpi], order=(p, d, q))
         self.model_fit: ARIMAResults = model.fit()
 
         logger.info("Training complete.")

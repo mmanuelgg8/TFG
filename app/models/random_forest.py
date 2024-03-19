@@ -14,8 +14,9 @@ logger = logging.getLogger(__name__)
 
 
 class RandomForestModel(Model):
-    def __init__(self, df, kpi):
+    def __init__(self, df, kpi, model_params):
         super().__init__(df, kpi)
+        self.model_params = model_params
 
     def train_model(self) -> None:
         logger.info("Training {}...".format(self.__class__.__name__))
@@ -23,7 +24,9 @@ class RandomForestModel(Model):
         self.train: list = self.train
         # logger.info("Train: \n{}".format(self.train))
         # logger.info("Test: \n{}".format(self.test))
-        model = RandomForestRegressor(n_estimators=100)
+        n_estimators = self.model_params.get("n_estimators", 100)
+        max_depth = self.model_params.get("max_depth", None)
+        model = RandomForestRegressor(n_estimators=n_estimators, max_depth=max_depth)
         self.model_fit = model.fit(self.train, self.train[self.kpi])
 
         logger.info("Training complete.")

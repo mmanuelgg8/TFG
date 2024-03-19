@@ -3,14 +3,23 @@
   "bands": ["B04", "B08"],
   "download": {
     "enabled": true,
+    "url": "https://sh.dataspace.copernicus.eu/api/v1/process",
+    "token_url": "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token",
+    "client_id_env": "COPERNICUS_CLIENT_ID",
+    "client_secret_env": "COPERNICUS_CLIENT_SECRET",
+    "type": "sentinel-2-l2a",
     "bbox": [15.959, 48.683, 16.002, 48.71],
     "start_date": "2017-01-01",
     "end_date": "2022-01-01",
     "date_interval": 1,
     "interval_type": "weeks",
     "bands": ["B04", "B08"],
-    "format": "tiff",
-    "evalscript": "ndvi"
+    "format": "image/tiff",
+    "evalscript": "ndvi",
+    "data_filter": {
+      "maxCloudCoverage": 10,
+      "minCloudCoverage": 0
+    }
   },
   "models": ["arima", "random_forest"],
   "train": {
@@ -18,7 +27,7 @@
     "save_visualization": true,
     "save_model": true,
     "start_date": "2017-01-01",
-    "end_date": "2020-01-01",
+    "end_date": "2022-01-01",
     "date_interval": 1,
     "interval_type": "weeks",
     "kpi": "mean",

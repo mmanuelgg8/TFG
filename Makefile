@@ -1,10 +1,11 @@
 # Makefile for a Python project
 IMAGE_NAME = image-pipeline
+FILE = isla_mayor.json
 
 .PHONY: clean install test
 
 # Set the default target
-default: install
+default: venv source-venv install
 
 # Install dependencies
 install:
@@ -46,3 +47,6 @@ test-run:
 
 venv:
 	virtualenv TFG
+
+source-venv:
+	source TFG/bin/activate

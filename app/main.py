@@ -45,6 +45,12 @@ def main(config_file):
             end_date=end_date,
             date_interval=parse_date_interval(interval_type, date_interval),
             name_id=name_id,
+            url=download_config.get("url"),
+            type=download_config.get("type"),
+            data_filter=download_config.get("data_filter"),
+            token_url=download_config.get("token_url"),
+            client_id_env=download_config.get("client_id_env"),
+            client_secret_env=download_config.get("client_secret_env"),
         )
 
     train_config = config.get("train")
@@ -67,12 +73,13 @@ def main(config_file):
         )
         df = process_data.create_dataframe(train_config.get("kpi"))
         logger.info("Dataframe: \n{}".format(df))
+        model_params = train_config.get("model_params")
         models = []
         for model_name in train_config.get("models"):
             if model_name == "arima":
-                models.append(ArimaModel(df, train_config.get("kpi")))
+                models.append(ArimaModel(df, train_config.get("kpi"), model_params.get("arima")))
             elif model_name == "random_forest":
-                models.append(RandomForestModel(df, train_config.get("kpi")))
+                models.append(RandomForestModel(df, train_config.get("kpi"), model_params.get("random_forest")))
         if train_config.get("enabled"):
             for model in models:
                 model.train_model()

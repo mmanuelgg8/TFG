@@ -2,7 +2,7 @@ import logging
 import os
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, Generator
+from typing import Any, Dict, Generator, Optional
 
 from configuration.configuration import Configuration
 from dateutil.relativedelta import relativedelta
@@ -24,35 +24,10 @@ class DataTypeConstants(Enum):
     SENTINEL2_L2A = "sentinel-2-l2a"
     SENTINEL2_L1C = "sentinel-2-l1c"
     SENTINEL1 = "sentinel-1"
-    DEM = "dem"
-    MODIS = "modis"
     LANDSAT8 = "landsat-8"
     LANDSAT7 = "landsat-7"
     LANDSAT5 = "landsat-5"
     LANDSAT4 = "landsat-4"
-    ENVISAT_MERIS = "envisat-meris"
-    ENVISAT_AATSR = "envisat-aatsr"
-    ENVISAT_ASAI = "envisat-asai"
-    PROBAV_S1 = "probav-s1"
-    PROBAV_S10 = "probav-s10"
-    PROBAV_S5 = "probav-s5"
-    PROBAV_S1_TOA = "probav-s1-toa"
-    PROBAV_S10_TOA = "probav-s10-toa"
-    PROBAV_S5_TOA = "probav-s5-toa"
-    PROBAV_S1_SR = "probav-s1-sr"
-    PROBAV_S10_SR = "probav-s10-sr"
-    PROBAV_S5_SR = "probav-s5-sr"
-    PROBAV_S1_TOA_SR = "probav-s1-toa-sr"
-    PROBAV_S10_TOA_SR = "probav-s10-toa-sr"
-    PROBAV_S5_TOA_SR = "probav-s5-toa-sr"
-    PROBAV_S1_CLOUDS = "probav-s1-clouds"
-    PROBAV_S10_CLOUDS = "probav-s10-clouds"
-    PROBAV_S5_CLOUDS = "probav-s5-clouds"
-    PROBAV_S1_TOA_CLOUDS = "probav-s1-toa-clouds"
-    PROBAV_S10_TOA_CLOUDS = "probav-s10-toa-clouds"
-    PROBAV_S5_TOA_CLOUDS = "probav-s5-toa-clouds"
-    PROBAV_S1_SR_CLOUDS = "probav-s1-sr-clouds"
-    PROBAV_S10_SR_CLOUDS = "probav-s10-sr-clouds"
 
 
 class UrlConstants(Enum):
@@ -68,11 +43,6 @@ class DataFilterConstants(Enum):
     TIME_RANGE = "timeRange"
     FROM = "from"
     TO = "to"
-    GEOMETRY = "geometry"
-    MBR = "mbr"
-    CRS = "crs"
-    PRODUCT_TYPE = "productType"
-    SENSOR_OPERATIONAL_MODE = "sensorOperationalMode"
 
 
 class ImageFormatConstants(Enum):
@@ -83,11 +53,14 @@ class ImageFormatConstants(Enum):
 
 class Downloader:
 
-    def __init__(self, client_id, client_secret):
+    def __init__(self, client_id, client_secret, token_url: Optional[str]):
         self.client_id: str = client_id
         self.client_secret: str = client_secret
+        if token_url is None:
+            token_url = UrlConstants.COPERNICUS_TOKEN.value
+        self.token_url: str = token_url
 
-    def get_token(self, oauth, token_url: str = UrlConstants.COPERNICUS_TOKEN.value) -> Dict[str, Any]:
+    def get_token(self, oauth, token_url: str) -> Dict[str, Any]:
         token = oauth.fetch_token(
             token_url=token_url,
             client_secret=self.client_secret,
@@ -98,7 +71,7 @@ class Downloader:
         try:
             client = BackendApplicationClient(client_id=self.client_id)
             oauth = OAuth2Session(client_id=self.client_id, client=client)
-            oauth.token = self.get_token(oauth)
+            oauth.token = self.get_token(oauth, self.token_url)
         except Exception as e:
             logger.error("Error getting token for user id " + self.client_id)
             raise e
@@ -149,6 +122,8 @@ class Downloader:
         elif format == ImageFormatConstants.JPEG.value:
             path = PNGS_PATH
             file_extension = ".jpg"
+        else:
+            raise ValueError(f"Format {format} not supported. Formats supported: image/tiff, image/png, image/jpeg")
 
         error_suffix = "-error" if error else ""
         path = path + folder
