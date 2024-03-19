@@ -63,7 +63,7 @@ class RandomForestModel(Model):
         plt.legend(["Train", "Test", "Predictions"])
         plt.title("Random Forest Model")
         plt.xlabel(f"Time ({interval_type})")
-        plt.ylabel(self.kpi)
+        plt.ylabel(f"KPI ({self.kpi})")
         plt.savefig(path)
         plt.close()
         logger.info(f"Visualization saved as {path}")

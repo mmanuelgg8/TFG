@@ -2,12 +2,12 @@
   "name_id": "isla_mayor_ndvi",
   "bands": ["B04", "B08"],
   "download": {
-    "enabled": true,
+    "enabled": false,
     "url": "https://sh.dataspace.copernicus.eu/api/v1/process",
     "token_url": "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token",
     "client_id_env": "COPERNICUS_CLIENT_ID",
     "client_secret_env": "COPERNICUS_CLIENT_SECRET",
-    "type": "sentinel-2-l2a",
+    "satellite_type": "sentinel-2-l2a",
     "bbox": [15.959, 48.683, 16.002, 48.71],
     "start_date": "2017-01-01",
     "end_date": "2022-01-01",
@@ -21,7 +21,6 @@
       "minCloudCoverage": 0
     }
   },
-  "models": ["arima", "random_forest"],
   "train": {
     "enabled": true,
     "save_visualization": true,
@@ -32,7 +31,7 @@
     "interval_type": "weeks",
     "kpi": "mean",
     "formula": "NDVI",
-    "models": ["arima", "random_forest"],
+    "models": ["arima", "random_forest", "gradient_boosting_regressor"],
     "model_params": {
       "arima": {
         "p": 5,

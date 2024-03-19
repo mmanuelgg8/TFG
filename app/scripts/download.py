@@ -22,7 +22,7 @@ def download(
     date_interval: relativedelta,
     name_id: str = "image_",
     format: str = ImageFormatConstants.TIFF.value,
-    type: str = DataTypeConstants.SENTINEL2_L2A.value,
+    satellite_type: str = DataTypeConstants.SENTINEL2_L2A.value,
     url: str = UrlConstants.COPERNICUS_API_PROCESS.value,
     token_url: str = UrlConstants.COPERNICUS_TOKEN.value,
     data_filter: Optional[dict] = None,
@@ -64,7 +64,7 @@ def download(
         if data_filter:
             filters.update(data_filter)
 
-        data = [{"type": type, "dataFilter": filters}]
+        data = [{"type": satellite_type, "dataFilter": filters}]
         payload = downloader.create_payload(bbox, data, format, evalscript)
         name = date_start.strftime("%Y-%m-%d") + "_" + date_end.strftime("%Y-%m-%d")
         downloader.download(url, payload, name_id, name)

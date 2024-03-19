@@ -3,9 +3,9 @@ import logging
 from dotenv import load_dotenv
 from matplotlib import pyplot as plt
 from models.ml_model import Model
+from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
-from statsmodels.tsa.arima.model import ARIMA, ARIMAResults
 from utils import set_logging
 
 load_dotenv()
@@ -13,31 +13,33 @@ set_logging()
 logger = logging.getLogger(__name__)
 
 
-class ArimaModel(Model):
-
+class GradientBoostingRegressorModel(Model):
     def __init__(self, df, kpi, model_params):
         super().__init__(df, kpi)
+        if model_params is None:
+            model_params = {}
         self.model_params = model_params
 
     def train_model(self) -> None:
         logger.info("Training {}...".format(self.__class__.__name__))
-
         self.train, self.test = train_test_split(self.df, test_size=0.2, shuffle=False)
+        self.train: list = self.train
         # logger.info("Train: \n{}".format(self.train))
         # logger.info("Test: \n{}".format(self.test))
-        p = self.model_params.get("p", 5)
-        d = self.model_params.get("d", 1)
-        q = self.model_params.get("q", 0)
-        model: ARIMA = ARIMA(self.train[self.kpi], order=(p, d, q))
-        self.model_fit: ARIMAResults = model.fit()
+        n_estimators = self.model_params.get("n_estimators", 100)
+        max_depth = self.model_params.get("max_depth", None)
+        model = GradientBoostingRegressor(n_estimators=n_estimators, max_depth=max_depth)
+        self.model_fit = model.fit(self.train, self.train[self.kpi])
 
         logger.info("Training complete.")
 
     def evaluate(self):
-        forecast = self.model_fit.forecast(steps=len(self.test))
-        forecast_errors = mean_squared_error(self.test[self.kpi], forecast)
+        predictions = self.model_fit.predict(self.test)
+        errors = mean_squared_error(self.test[self.kpi], predictions)
+        score = self.model_fit.score(self.test, predictions)
 
-        logger.info("Mean Squared Forecast Error: {}".format(forecast_errors))
+        logger.info("Score: {}".format(score))
+        logger.info("Mean Squared Error: {}".format(errors))
 
     def predict(self, model_name: str) -> None:
         if self.model_fit is None:
@@ -50,18 +52,18 @@ class ArimaModel(Model):
                 logger.error("Error loading model")
                 raise e
         self.train, self.test = train_test_split(self.df, test_size=0.2, shuffle=False)
-        forecast = self.model_fit.forecast(steps=len(self.test))
-        logger.info("Forecast: {}".format(forecast))
+        predictions = self.model_fit.apply(self.test)
+        logger.info("Predictions: {}".format(predictions))
 
     def save_visualization(self, path: str, interval_type: str) -> None:
         self.train, self.test = train_test_split(self.df, test_size=0.2, shuffle=False)
         plt.plot(self.train[self.kpi], color="blue")
         plt.plot(self.test[self.kpi], color="orange")
-        forecast = self.model_fit.forecast(steps=len(self.test))
+        predictions = self.model_fit.apply(self.test)
         off_set = len(self.train)
-        plt.plot(range(off_set, off_set + len(forecast)), forecast, color="green")
-        plt.legend(["Train", "Test", "Forecast"])
-        plt.title("ARIMA Model")
+        plt.plot(range(off_set, off_set + len(predictions)), predictions, color="green")
+        plt.legend(["Train", "Test", "Predictions"])
+        plt.title("Gradient Boosting Regressor Model")
         plt.xlabel(f"Time ({interval_type})")
         plt.ylabel(f"KPI ({self.kpi})")
         plt.savefig(path)

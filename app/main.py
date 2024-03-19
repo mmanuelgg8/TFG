@@ -6,6 +6,7 @@ from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
 from models.arima import ArimaModel
+from models.gradient_boosting_regressor import GradientBoostingRegressorModel
 from models.random_forest import RandomForestModel
 from scripts.download import download
 from utils import set_logging
@@ -22,6 +23,18 @@ def parse_date_interval(interval_type, date_interval) -> relativedelta:
     elif interval_type == "weeks":
         date_interval = relativedelta(weeks=date_interval)
     return date_interval
+
+
+def init_models(model_names, df, kpi, model_params):
+    models = []
+    for model_name in model_names:
+        if model_name == "arima":
+            models.append(ArimaModel(df, kpi, model_params.get("arima")))
+        elif model_name == "gradient_boosting_regressor":
+            models.append(GradientBoostingRegressorModel(df, kpi, model_params.get("gradient_boosting_regressor")))
+        elif model_name == "random_forest":
+            models.append(RandomForestModel(df, kpi, model_params.get("random_forest")))
+    return models
 
 
 def main(config_file):
@@ -46,7 +59,7 @@ def main(config_file):
             date_interval=parse_date_interval(interval_type, date_interval),
             name_id=name_id,
             url=download_config.get("url"),
-            type=download_config.get("type"),
+            satellite_type=download_config.get("satellite_type"),
             data_filter=download_config.get("data_filter"),
             token_url=download_config.get("token_url"),
             client_id_env=download_config.get("client_id_env"),
@@ -74,12 +87,7 @@ def main(config_file):
         df = process_data.create_dataframe(train_config.get("kpi"))
         logger.info("Dataframe: \n{}".format(df))
         model_params = train_config.get("model_params")
-        models = []
-        for model_name in train_config.get("models"):
-            if model_name == "arima":
-                models.append(ArimaModel(df, train_config.get("kpi"), model_params.get("arima")))
-            elif model_name == "random_forest":
-                models.append(RandomForestModel(df, train_config.get("kpi"), model_params.get("random_forest")))
+        models = init_models(train_config.get("models"), df, train_config.get("kpi"), model_params)
         if train_config.get("enabled"):
             for model in models:
                 model.train_model()
