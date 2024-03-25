@@ -1,12 +1,6 @@
 * TODO
-** [x] Crear el proyecto Python
-** [x] Scripts para descargar imágenes de Sentinel-2
-** [x] Usar Copernicus en lugar de Sentinel
-** (x) Estudiar APIs de Copernicus y Sentinel. ¿Qué se puede hacer con ellas?
-   - (_) openEO librería Python
-   - (x) API REST de Copernicus
-** [x] Buscar cultivos en España sobre los que trabajar
-   - [x] Arroz: Isla Mayor, Sevilla
-** [-] Aprender a descargar imágenes de Sentinel-2 en un rango de fechas
-** [-] Aprender a descargar imágenes de Sentinel-2 en un área determinada
-** ( ) Quitar harcoded de los scripts de descarga
+** ( ) Documentar el proyecto
+** ( ) Buscar otro caso de estudio (Sierra Nevada para el cambio de nieve o la bajada de agua en alguna laguna como la de Istán)
+** ( ) Estudiar cómo entrenar un modelo con SARIMA
+** ( ) Bibliografía
+** ( ) Memoria
