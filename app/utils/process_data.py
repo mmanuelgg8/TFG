@@ -3,7 +3,7 @@ import warnings
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -39,7 +39,7 @@ class ProcessData:
         date_interval: relativedelta,
         start_date: datetime,
         band_names: List[str],
-        formula: str,
+        formula: Optional[str],
     ):
         logger.info("Name ID: {}".format(name_id))
         tifs, self.time = self.tifs_to_array(name_id, start_date, date_interval)
@@ -47,7 +47,11 @@ class ProcessData:
 
         # logger.info("Bands: {}".format(bands))
 
-        self.data: np.ndarray = self.get_data(self.parse_formula(formula), bands)
+        if formula is None:
+            data: np.ndarray = np.array(bands)
+            self.data = np.nan_to_num(data, nan=0, posinf=0, neginf=0)
+        else:
+            self.data: np.ndarray = self.get_data(self.parse_formula(formula), bands)
 
         logger.info("Data shape: {}".format(self.data.shape))
         # logger.info("Data: {}".format(data))
