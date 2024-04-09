@@ -8,5 +8,5 @@ pyhocon
 scikit-learn
 matplotlib
 statsmodels
-keras
+pmdarima
 rasterio

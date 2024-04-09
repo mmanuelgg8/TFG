@@ -1,6 +1,7 @@
 {
   "name_id": "sierra_nevada_ndsi",
-  "bands": ["B03", "B11"],
+  "date_interval": 1,
+  "interval_type": "weeks",
   "download": {
     "enabled": false,
     "url": "https://sh.dataspace.copernicus.eu/api/v1/process",
@@ -14,8 +15,6 @@
     ],
     "start_date": "2017-01-01",
     "end_date": "2022-01-01",
-    "date_interval": 1,
-    "interval_type": "months",
     "format": "image/tiff",
     "evalscript": "ndsi",
     "data_filter": {
@@ -29,16 +28,12 @@
     "save_model": true,
     "start_date": "2017-01-01",
     "end_date": "2022-01-01",
-    "date_interval": 1,
-    "interval_type": "months",
     "kpi": "mean",
-    "formula": "NDVI",
-    "models": ["arima", "random_forest"],
+    "models": ["sarima", "random_forest"],
     "model_params": {
-      "arima": {
-        "p": 5,
-        "d": 1,
-        "q": 0
+      "sarima": {
+        "seasonal": true,
+        "m": 52
       },
       "random_forest": {
         "n_estimators": 100,
