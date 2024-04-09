@@ -2,7 +2,7 @@
   "name_id": "sierra_nevada_ndsi",
   "bands": ["B03", "B11"],
   "download": {
-    "enabled": true,
+    "enabled": false,
     "url": "https://sh.dataspace.copernicus.eu/api/v1/process",
     "token_url": "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token",
     "client_id_env": "COPERNICUS_CLIENT_ID",
@@ -33,7 +33,7 @@
     "interval_type": "months",
     "kpi": "mean",
     "formula": "NDVI",
-    "models": ["arima", "random_forest", "gradient_boosting_regressor"],
+    "models": ["arima", "random_forest"],
     "model_params": {
       "arima": {
         "p": 5,

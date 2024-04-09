@@ -3,18 +3,15 @@ import json
 import logging
 import os
 from datetime import datetime
+from importlib import import_module
 
+import numpy as np
+from configuration.configuration import Configuration
 from dateutil.relativedelta import relativedelta
 from rasterio import rasterio
-from models.arima import ArimaModel
-from models.gradient_boosting_regressor import GradientBoostingRegressorModel
-from models.random_forest import RandomForestModel
 from scripts.download import download
 from utils import set_logging
-from utils.process_data import create_dataframe, process_data, tifs_to_array
-from configuration.configuration import Configuration
-import pandas as pd
-import numpy as np
+from utils.process_data import create_dataframe, tifs_to_array
 
 set_logging()
 logger = logging.getLogger(__name__)
@@ -31,12 +28,13 @@ def parse_date_interval(interval_type, date_interval) -> relativedelta:
 def init_models(model_names, df, kpi, model_params):
     models = []
     for model_name in model_names:
-        if model_name == "arima":
-            models.append(ArimaModel(df, kpi, model_params.get("arima")))
-        elif model_name == "gradient_boosting_regressor":
-            models.append(GradientBoostingRegressorModel(df, kpi, model_params.get("gradient_boosting_regressor")))
-        elif model_name == "random_forest":
-            models.append(RandomForestModel(df, kpi, model_params.get("random_forest")))
+        try:
+            module_name = "".join([word.capitalize() for word in model_name.split("_")])
+            module = import_module(f"models.{model_name}")
+            model = getattr(module, f"{module_name}Model")
+            models.append(model(df, kpi, model_params.get(model_name)))
+        except (AttributeError, ImportError):
+            logger.error(f"Model {model_name} not found")
     return models
 
 

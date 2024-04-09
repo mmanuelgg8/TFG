@@ -30,7 +30,7 @@
     "interval_type": "weeks",
     "kpi": "mean",
     "formula": "NDVI",
-    "models": ["arima", "random_forest", "gradient_boosting_regressor"],
+    "models": ["arima", "random_forest"],
     "model_params": {
       "arima": {
         "p": 5,
