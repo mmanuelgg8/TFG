@@ -34,8 +34,7 @@ class KPIs:
             return self.get_std()
 
     def get_mean(self):
-        # return np.mean(self.data, axis=self.axis)
-        return np.mean(self.data)
+        return np.mean(self.data, axis=self.axis)
 
     def get_max(self):
         return np.max(self.data, axis=self.axis)

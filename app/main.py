@@ -5,13 +5,16 @@ import os
 from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
+from rasterio import rasterio
 from models.arima import ArimaModel
 from models.gradient_boosting_regressor import GradientBoostingRegressorModel
 from models.random_forest import RandomForestModel
 from scripts.download import download
 from utils import set_logging
-from utils.process_data import ProcessData
+from utils.process_data import create_dataframe, process_data, tifs_to_array
 from configuration.configuration import Configuration
+import pandas as pd
+import numpy as np
 
 set_logging()
 logger = logging.getLogger(__name__)
@@ -77,14 +80,19 @@ def main(config_file):
         start_date = datetime.strptime(train_config.get("start_date"), "%Y-%m-%d")
         interval_type = train_config.get("interval_type", "weeks")
         date_interval = train_config.get("date_interval", 1)
-        process_data = ProcessData(
-            name_id=name_id,
-            date_interval=parse_date_interval(interval_type, date_interval),
-            start_date=start_date,
-            band_names=config.get("bands"),
-            formula=train_config.get("formula"),
-        )
-        df = process_data.create_dataframe(train_config.get("kpi"))
+        date_interval = parse_date_interval(interval_type, date_interval)
+        tiffs, time_values = tifs_to_array(name_id, start_date, date_interval, interval_type)
+        data = []
+        for tif in tiffs:
+            with rasterio.open(tif) as src:
+                data.append(src.read())
+
+        data = np.array(data)  # (image, bands, height, width)
+        data = data.reshape(data.shape[0], data.shape[2], data.shape[3])  # (image, height, width)
+        logger.info("Data shape: {}".format(data[:, 0, 0]))
+        normalized_data = np.nan_to_num(data, nan=0, posinf=0, neginf=0) / 255
+        df = create_dataframe(normalized_data, time_values, train_config.get("kpi"))
+        # df = process_data(name_id, date_interval, start_date, config.get("bands"), train_config.get("formula"))
         logger.info("Dataframe: \n{}".format(df))
         model_params = train_config.get("model_params")
         models = init_models(train_config.get("models"), df, train_config.get("kpi"), model_params)
@@ -119,7 +127,7 @@ def main(config_file):
                 if os.path.exists(visualization_path):
                     os.remove(visualization_path)
                     logger.info(f"File {visualization_path} removed")
-                model.save_visualization(visualization_path, train_config.get("interval_type"))
+                model.save_visualization(visualization_path, name_id, train_config.get("interval_type"))
 
 
 if __name__ == "__main__":

@@ -53,15 +53,17 @@ class RandomForestModel(Model):
         predictions = self.model_fit.predict(self.test)
         logger.info("Predictions: {}".format(predictions))
 
-    def save_visualization(self, path: str, interval_type: str) -> None:
+    def save_visualization(self, path: str, name_id: str, interval_type: str) -> None:
         self.train, self.test = train_test_split(self.df, test_size=0.2, shuffle=False)
         plt.plot(self.train[self.kpi], color="blue")
         plt.plot(self.test[self.kpi], color="orange")
         predictions = self.model_fit.predict(self.test)
         off_set = len(self.train)
         plt.plot(range(off_set, off_set + len(predictions)), predictions, color="green")
-        plt.legend(["Train", "Test", "Predictions"])
-        plt.title("Random Forest Model")
+        future = self.model_fit.predict(self.df)
+        plt.plot(range(len(self.df), len(self.df) + len(future)), future, color="red")
+        plt.legend(["Train", "Test", "Predictions", "Future"])
+        plt.title(f"{name_id} - Random Forest Model")
         plt.xlabel(f"Time ({interval_type})")
         plt.ylabel(f"KPI ({self.kpi})")
         plt.savefig(path)

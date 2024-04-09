@@ -1,20 +1,23 @@
 {
-  "name_id": "isla_mayor_ndvi",
-  "bands": ["B04", "B08"],
+  "name_id": "sierra_nevada_ndsi",
+  "bands": ["B03", "B11"],
   "download": {
-    "enabled": false,
+    "enabled": true,
     "url": "https://sh.dataspace.copernicus.eu/api/v1/process",
     "token_url": "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token",
     "client_id_env": "COPERNICUS_CLIENT_ID",
     "client_secret_env": "COPERNICUS_CLIENT_SECRET",
     "satellite_type": "sentinel-2-l2a",
-    "bbox": [15.959, 48.683, 16.002, 48.71],
+    "bbox": [
+      -3.4470127612104298, 37.08740963716705, -3.2866810661788666,
+      37.01096018664316
+    ],
     "start_date": "2017-01-01",
     "end_date": "2022-01-01",
     "date_interval": 1,
-    "interval_type": "weeks",
+    "interval_type": "months",
     "format": "image/tiff",
-    "evalscript": "ndvi",
+    "evalscript": "ndsi",
     "data_filter": {
       "maxCloudCoverage": 10,
       "minCloudCoverage": 0
@@ -27,7 +30,7 @@
     "start_date": "2017-01-01",
     "end_date": "2022-01-01",
     "date_interval": 1,
-    "interval_type": "weeks",
+    "interval_type": "months",
     "kpi": "mean",
     "formula": "NDVI",
     "models": ["arima", "random_forest", "gradient_boosting_regressor"],

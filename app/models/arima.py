@@ -53,15 +53,18 @@ class ArimaModel(Model):
         forecast = self.model_fit.forecast(steps=len(self.test))
         logger.info("Forecast: {}".format(forecast))
 
-    def save_visualization(self, path: str, interval_type: str) -> None:
+    def save_visualization(self, path: str, name_id: str, interval_type: str) -> None:
         self.train, self.test = train_test_split(self.df, test_size=0.2, shuffle=False)
         plt.plot(self.train[self.kpi], color="blue")
         plt.plot(self.test[self.kpi], color="orange")
         forecast = self.model_fit.forecast(steps=len(self.test))
         off_set = len(self.train)
         plt.plot(range(off_set, off_set + len(forecast)), forecast, color="green")
-        plt.legend(["Train", "Test", "Forecast"])
+        future = self.model_fit.forecast(steps=len(self.df))
+        plt.plot(range(len(self.df), len(self.df) + len(future)), future, color="red")
+        plt.legend(["Train", "Test", "Forecast", "Future"])
         plt.title("ARIMA Model")
+        plt.title(f"{name_id} - ARIMA Model")
         plt.xlabel(f"Time ({interval_type})")
         plt.ylabel(f"KPI ({self.kpi})")
         plt.savefig(path)

@@ -55,7 +55,7 @@ class GradientBoostingRegressorModel(Model):
         predictions = self.model_fit.apply(self.test)
         logger.info("Predictions: {}".format(predictions))
 
-    def save_visualization(self, path: str, interval_type: str) -> None:
+    def save_visualization(self, path: str, name_id: str, interval_type: str) -> None:
         self.train, self.test = train_test_split(self.df, test_size=0.2, shuffle=False)
         plt.plot(self.train[self.kpi], color="blue")
         plt.plot(self.test[self.kpi], color="orange")
@@ -63,7 +63,7 @@ class GradientBoostingRegressorModel(Model):
         off_set = len(self.train)
         plt.plot(range(off_set, off_set + len(predictions)), predictions, color="green")
         plt.legend(["Train", "Test", "Predictions"])
-        plt.title("Gradient Boosting Regressor Model")
+        plt.title(f"{name_id} - Gradient Boosting Regressor Model")
         plt.xlabel(f"Time ({interval_type})")
         plt.ylabel(f"KPI ({self.kpi})")
         plt.savefig(path)
