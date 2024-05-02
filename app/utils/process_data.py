@@ -1,4 +1,5 @@
 import logging
+import os
 import warnings
 from datetime import datetime
 from enum import Enum
@@ -8,9 +9,10 @@ from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 import rasterio
-from configuration.configuration import Configuration
 from dotenv import load_dotenv
 from matplotlib.dates import relativedelta
+
+from configuration.configuration import Configuration
 from scripts.kpis import KPIs, parse_to_constant_kpi
 from utils import set_logging
 
@@ -110,7 +112,7 @@ def tifs_to_array(name_id, start_date, date_interval, interval_type) -> Tuple[np
     tifs_dir: Path = Path(geotiffs_path)
     dir: Path = tifs_dir.joinpath(name_id)
     if not dir.exists():
-        raise FileNotFoundError(f"Directory {dir} does not exist")
+        os.makedirs(dir)
 
     for tif in sorted(dir.iterdir()):
         if not tif.name.endswith(".xml"):
