@@ -46,7 +46,8 @@ test-run:
 	cd app && pwd && python -m main -c "isla_mayor.json"
 
 venv:
-	virtualenv TFG
+	# virtualenv TFG
+	python -m venv venv
 
 source-venv:
-	source TFG/bin/activate
+	source venv/bin/activate

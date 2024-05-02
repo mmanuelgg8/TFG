@@ -3,6 +3,7 @@
 *.DS_Store
 *.pyc
 
+venv
 data/geotiffs/*
 data/mbtiles/*
 data/tmp/pngs/*
