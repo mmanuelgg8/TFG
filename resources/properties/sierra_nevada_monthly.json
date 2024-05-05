@@ -1,7 +1,7 @@
 {
-  "name_id": "sierra_nevada_ndsi_weekly",
+  "name_id": "sierra_nevada_ndsi_monthly",
   "date_interval": 1,
-  "interval_type": "weeks",
+  "interval_type": "months",
   "download": {
     "enabled": true,
     "url": "https://sh.dataspace.copernicus.eu/api/v1/process",
@@ -33,7 +33,7 @@
     "model_params": {
       "sarima": {
         "seasonal": true,
-        "m": 52
+        "m": 12
       },
       "random_forest": {
         "n_estimators": 100,
