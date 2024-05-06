@@ -26,8 +26,9 @@ class SarimaModel(Model):
         self.train, self.test = train_test_split(self.df, test_size=0.2, shuffle=False)
         m = self.model_params.get("m", 12)
         seasonal = self.model_params.get("seasonal", True)
+        stationary = self.model_params.get("stationary", False)
         logger.info(f"Params: m={m}, seasonal={seasonal}")
-        self.model_fit = auto_arima(self.train[self.kpi], seasonal=seasonal, m=m)
+        self.model_fit = auto_arima(self.train[self.kpi], seasonal=seasonal, m=m, stationary=stationary)
 
         logger.info("Training complete.")
 
