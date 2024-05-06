@@ -59,7 +59,7 @@ class RandomForestModel(Model):
         plt.plot(range(len(self.train), len(self.train) + len(self.test)), prediction, color="green")
         future = self.model_fit.predict(self.df)
         plt.plot(range(len(self.df), len(self.df) + len(future)), future, color="purple")
-        plt.legend(["Train", "Test", "Prediction", "Future"])
+        plt.legend(["Training", "Test", "Prediction", "Future"])
         plt.title(f"{name_id} - Random Forest Model")
         plt.xlabel(f"Time ({interval_type})")
         plt.ylabel(f"KPI ({self.kpi})")
