@@ -4,6 +4,7 @@ import logging
 import os
 from datetime import datetime
 from importlib import import_module
+import shutil
 
 import numpy as np
 from configuration.configuration import Configuration
@@ -40,6 +41,7 @@ def init_models(model_names, df, kpi, model_params):
 
 def main(config_file):
     configuration = Configuration()
+    GEOTIFFS_PATH: str = str(configuration["geotiffs_path"])
     with open(config_file, "r") as f:
         config = json.load(f)
 
@@ -49,6 +51,9 @@ def main(config_file):
     name_id = config.get("name_id")
     download_config = config.get("download")
     if download_config.get("enabled"):
+        if download_config.get("remove_previous_download"):
+            shutil.rmtree(GEOTIFFS_PATH + config.get("name_id"))
+            logger.info("Previous download removed")
         logger.info("Downloading images...")
         start_date = datetime.strptime(download_config.get("start_date"), "%Y-%m-%d")
         end_date = datetime.strptime(download_config.get("end_date"), "%Y-%m-%d")
