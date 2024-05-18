@@ -3,7 +3,7 @@
   "date_interval": 1,
   "interval_type": "months",
   "download": {
-    "enabled": true,
+    "enabled": false,
     "url": "https://sh.dataspace.copernicus.eu/api/v1/process",
     "token_url": "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token",
     "client_id_env": "COPERNICUS_CLIENT_ID",
@@ -30,6 +30,7 @@
     "model_params": {
       "sarima": {
         "seasonal": true,
+        "stationary": false,
         "m": 12
       },
       "random_forest": {

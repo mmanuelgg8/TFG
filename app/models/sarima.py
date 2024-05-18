@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 from models.ml_model import Model
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
-from pmdarima import auto_arima
+import pmdarima as pm
 
 from utils import set_logging
 
@@ -28,7 +28,7 @@ class SarimaModel(Model):
         seasonal = self.model_params.get("seasonal", True)
         stationary = self.model_params.get("stationary", False)
         logger.info(f"Params: m={m}, seasonal={seasonal}")
-        self.model_fit = auto_arima(self.train[self.kpi], seasonal=seasonal, m=m, stationary=stationary)
+        self.model_fit = pm.auto_arima(self.train[self.kpi], seasonal=seasonal, m=m, stationary=stationary)
 
         logger.info("Training complete.")
 
@@ -56,11 +56,15 @@ class SarimaModel(Model):
         self.train, self.test = train_test_split(self.df, test_size=0.3, shuffle=False)
         plt.plot(self.train[self.kpi], color="blue")
         plt.plot(self.test[self.kpi], color="orange")
+        # plt.scatter(npself.test), self.test, color="orange", marker="x")
+        logger.info(f"Test: {self.test} - {self.test[self.kpi]} - {self.test.index} and type {type(self.test)}")
         prediction = self.model_fit.predict(n_periods=len(self.test))
         plt.plot(range(len(self.train), len(self.train) + len(self.test)), prediction, color="green")
         future = self.model_fit.predict(n_periods=len(self.df))
         plt.plot(range(len(self.df), len(self.df) + len(future)), future, color="purple")
-        plt.legend(["Training", "Test", "Prediction", "Future"])
+        predict_in_sample = self.model_fit.predict_in_sample()
+        plt.plot(range(len(self.df), len(self.df) + len(predict_in_sample)), predict_in_sample, color="red")
+        plt.legend(["Training", "Test", "Prediction", "Future", "Predict in sample"])
         plt.title("SARIMA Model")
         plt.title(f"{name_id} - SARIMA Model")
         plt.xlabel(f"Time ({interval_type})")

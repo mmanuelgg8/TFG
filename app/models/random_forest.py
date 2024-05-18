@@ -55,6 +55,12 @@ class RandomForestModel(Model):
         self.train, self.test = train_test_split(self.df, test_size=0.2, shuffle=False)
         plt.plot(self.train[self.kpi], color="blue")
         plt.plot(self.test[self.kpi], color="orange")
+        # plt.scatter(
+        #     np.arange(len(self.train), len(self.train) + len(self.test)),
+        #     self.test[self.kpi],
+        #     color="orange",
+        #     marker="x",
+        # )
         prediction = self.model_fit.predict(self.test)
         plt.plot(range(len(self.train), len(self.train) + len(self.test)), prediction, color="green")
         future = self.model_fit.predict(self.df)
