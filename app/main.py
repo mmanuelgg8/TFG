@@ -90,11 +90,10 @@ def main(config_file):
 
         data = np.array(data)  # (image, bands, height, width)
         data = data.reshape(data.shape[0], data.shape[2], data.shape[3])  # (image, height, width)
-        # logger.info("Data shape: {}".format(data[:, 0, 0]))
+        logger.info("Data shape: {}".format(data[:, 0, 0]))
         normalized_data = np.nan_to_num(data, nan=0, posinf=0, neginf=0) / 255
         df = create_dataframe(normalized_data, time_values, train_config.get("kpi"))
-        # df = process_data(name_id, date_interval, start_date, config.get("bands"), train_config.get("formula"))
-        # logger.info("Dataframe: \n{}".format(df))
+        logger.info("Dataframe: \n{}".format(df))
         model_params = train_config.get("model_params")
         models = init_models(train_config.get("models"), df, train_config.get("kpi"), model_params)
         if train_config.get("enabled"):

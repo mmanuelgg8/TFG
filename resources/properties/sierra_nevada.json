@@ -34,6 +34,7 @@
     "model_params": {
       "sarima": {
         "seasonal": true,
+        "stationary": false,
         "m": 52
       },
       "random_forest": {
