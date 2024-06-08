@@ -23,8 +23,6 @@ class ArimaModel(Model):
         logger.info("Training {}...".format(self.__class__.__name__))
 
         self.train, self.test = train_test_split(self.df, test_size=0.2, shuffle=False)
-        # logger.info("Train: \n{}".format(self.train))
-        # logger.info("Test: \n{}".format(self.test))
         p = self.model_params.get("p", 5)
         d = self.model_params.get("d", 1)
         q = self.model_params.get("q", 0)
