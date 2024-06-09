@@ -47,7 +47,7 @@ def download(
     with open(evalscript_path, "r") as f:
         evalscript = f.read()
 
-    print(evalscript)
+    logger.info(evalscript)
 
     for single_date in downloader.daterange(start_date, end_date, step=date_interval):
         date_start: datetime = single_date

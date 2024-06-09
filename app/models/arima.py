@@ -1,7 +1,9 @@
 import logging
+from typing import Dict, List
 
 from dotenv import load_dotenv
 from matplotlib import pyplot as plt
+from pandas import DataFrame
 from models.ml_model import Model
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
@@ -15,14 +17,16 @@ logger = logging.getLogger(__name__)
 
 class ArimaModel(Model):
 
-    def __init__(self, df, kpi, model_params):
+    def __init__(self, df: DataFrame, kpi: slice, model_params: Dict = {}):
         super().__init__(df, kpi)
-        self.model_params = model_params
+        self.model_params: Dict = model_params
 
     def train_model(self) -> None:
         logger.info("Training {}...".format(self.__class__.__name__))
 
         self.train, self.test = train_test_split(self.df, test_size=0.2, shuffle=False)
+        self.train: List = self.train
+        self.test: List = self.test
         p = self.model_params.get("p", 5)
         d = self.model_params.get("d", 1)
         q = self.model_params.get("q", 0)
@@ -31,7 +35,7 @@ class ArimaModel(Model):
 
         logger.info("Training complete.")
 
-    def evaluate(self):
+    def evaluate(self) -> None:
         forecast = self.model_fit.forecast(steps=len(self.test))
         forecast_errors = mean_squared_error(self.test[self.kpi], forecast)
 

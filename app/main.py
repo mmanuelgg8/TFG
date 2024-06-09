@@ -7,6 +7,8 @@ from importlib import import_module
 import shutil
 
 import numpy as np
+from numpy.core.multiarray import ndarray
+from pandas import DataFrame
 from configuration.configuration import Configuration
 from dateutil.relativedelta import relativedelta
 from rasterio import rasterio
@@ -26,7 +28,7 @@ def parse_date_interval(interval_type, date_interval) -> relativedelta:
     return date_interval
 
 
-def init_models(model_names, df, kpi, model_params):
+def init_models(model_names: str, df: DataFrame, kpi: slice, model_params: dict):
     models = []
     for model_name in model_names:
         try:
@@ -91,7 +93,7 @@ def main(config_file):
         data = np.array(data)  # (image, bands, height, width)
         data = data.reshape(data.shape[0], data.shape[2], data.shape[3])  # (image, height, width)
         logger.info("Data shape: {}".format(data[:, 0, 0]))
-        normalized_data = np.nan_to_num(data, nan=0, posinf=0, neginf=0) / 255
+        normalized_data: ndarray = np.nan_to_num(data, nan=0, posinf=0, neginf=0) / 255
         df = create_dataframe(normalized_data, time_values, train_config.get("kpi"))
         logger.info("Dataframe: \n{}".format(df))
         model_params = train_config.get("model_params")

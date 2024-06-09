@@ -1,9 +1,11 @@
+from datetime import datetime
 import logging
 import os
 from pathlib import Path
 from typing import Tuple
 
 import numpy as np
+from numpy.core.multiarray import ndarray
 import pandas as pd
 from dotenv import load_dotenv
 
@@ -16,14 +18,16 @@ set_logging()
 logger = logging.getLogger(__name__)
 
 
-def create_dataframe(data, time, kpi_name) -> pd.DataFrame:
+def create_dataframe(data: ndarray, time: ndarray, kpi_name: str) -> pd.DataFrame:
     """Create a dataframe from the data"""
     kpi_constant = parse_to_constant_kpi(kpi_name)
     kpi = KPIs(data, axis=(1, 2), kpi=kpi_constant)
     return pd.DataFrame({kpi_constant.value: kpi.get_kpi(), "time": time})
 
 
-def tifs_to_array(name_id, start_date, date_interval, interval_type) -> Tuple[np.ndarray, np.ndarray]:
+def tifs_to_array(
+    name_id: str, start_date: datetime, date_interval, interval_type: str
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Convert the tifs to a numpy array and return the array and the time values
     """

@@ -5,6 +5,7 @@ from typing import Any
 
 import joblib
 from dotenv import load_dotenv
+from pandas import DataFrame
 from utils import set_logging
 
 load_dotenv()
@@ -14,9 +15,9 @@ logger = logging.getLogger(__name__)
 
 class Model:
 
-    def __init__(self, df, kpi):
-        self.df = df
-        self.kpi = kpi
+    def __init__(self, df: DataFrame, kpi):
+        self.df: DataFrame = df
+        self.kpi: slice = kpi
         self.model_fit = None
 
     def train_model(self) -> None: ...
@@ -33,7 +34,7 @@ class Model:
         if not model_name.endswith(".sav"):
             raise RuntimeError("Filename should end with '.sav'")
         # pickle.dump(self.model_fit, open(model_name, "wb"))
-        self.model_name = model_name
+        self.model_name: str = model_name
         joblib.dump(self.model_fit, model_name)
         logger.info(f"Model saved as {model_name}")
 
