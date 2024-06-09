@@ -102,13 +102,13 @@ def main(config_file):
             for model in models:
                 model.train_model()
                 model.evaluate()
-            if train_config.get("save_model"):
-                models_path = str(configuration["models_path"])
-                if not os.path.exists(models_path):
-                    os.makedirs(models_path)
-                    logger.info(f"Directory {models_path} created")
-                model_path = os.path.join(models_path, f"{name_id}_{model.__class__.__name__}.sav")
-                model.save_model(model_path)
+                if train_config.get("save_model"):
+                    models_path = str(configuration["models_path"])
+                    if not os.path.exists(models_path):
+                        os.makedirs(models_path)
+                        logger.info(f"Directory {models_path} created")
+                    model_path = os.path.join(models_path, f"{name_id}_{model.__class__.__name__}.sav")
+                    model.save_model(model_path)
         if train_config.get("load_model"):
             models_path = str(configuration["models_path"])
             if not os.path.exists(models_path):
