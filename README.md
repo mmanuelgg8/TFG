@@ -4,15 +4,16 @@ Este repositorio contiene el código fuente de la aplicación web desarrollada p
 
 ## Descripción
 
-El objetivo de este proyecto es la obtención y procesamiento de imágenes satelitales de Sentinel 2 para la detección y posterior predicción del crecimiento de la vegetación sobre zonas de incendios forestales. Para ello se ha desarrollado un componente en la plataforma en la que trabaja el alumno, que permite la obtención de imágenes de satélite de forma automática, y un componente de procesamiento de imágenes que permite la detección de zonas de incendio y la predicción del crecimiento de la vegetación en dichas zonas.
+El objetivo de este proyecto es la obtención y procesamiento de imágenes satelitales de Sentinel 2 para el entrenamiento de modelos de aprendizaje automático de forma autónoma, por medio de un simple archivo de configuración.
+Además de ser expansible al poder diseñar nuevos modelos y poder compararlos.
 
 ## Despliegue
 
-Para usar la aplicación es necesario generar un entorno virtual de Python.
-Se ha usado pipenv en este caso. Los pasos a seguir pueden ejecutarse desde el `Makefile`.
+Para usar la aplicación es necesario disponer de Docker activo en el sistema.
+Con el uso de `make` se puede desplegar la aplicación de forma sencilla.
 
 ```bash
-pipenv run make install
+make run-image FILE"config.json"
 ```
 
 ## Bibliografía
