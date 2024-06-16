@@ -129,7 +129,7 @@ def main(config_file):
                 if os.path.exists(visualization_path):
                     os.remove(visualization_path)
                     logger.info(f"File {visualization_path} removed")
-                model.save_visualization(visualization_path, name_id, train_config.get("interval_type"))
+                model.save_visualization(visualization_path, name_id, config.get("interval_type"))
 
 
 if __name__ == "__main__":

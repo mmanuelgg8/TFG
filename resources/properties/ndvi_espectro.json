@@ -1,5 +1,5 @@
 {
-  "name_id": "isla_mayor_ndvi_monthly",
+  "name_id": "ndvi_espectro",
   "interval_type": "months",
   "download": {
     "enabled": true,
@@ -9,34 +9,13 @@
     "client_secret_env": "COPERNICUS_CLIENT_SECRET",
     "satellite_type": "sentinel-2-l2a",
     "bbox": [-6.158491, 37.131489, -6.133836, 37.114921],
-    "start_date": "2015-01-01",
+    "start_date": "2021-01-01",
     "end_date": "2022-01-01",
     "format": "image/tiff",
-    "evalscript": "ndvi",
+    "evalscript": "ndvi_espectro",
     "data_filter": {
       "maxCloudCoverage": 10,
       "minCloudCoverage": 0
-    }
-  },
-  "train": {
-    "enabled": true,
-    "save_visualization": true,
-    "save_model": true,
-    "start_date": "2015-01-01",
-    "end_date": "2022-01-01",
-    "kpi": "mean",
-    "models": ["arima", "sarima", "random_forest"],
-    "model_params": {
-      "arima": {},
-      "sarima": {
-        "seasonal": true,
-        "stationary": false,
-        "m": 12
-      },
-      "random_forest": {
-        "n_estimators": 100,
-        "max_depth": 10
-      }
     }
   }
 }

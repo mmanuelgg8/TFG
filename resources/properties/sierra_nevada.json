@@ -1,6 +1,5 @@
 {
   "name_id": "sierra_nevada_ndsi_weekly",
-  "date_interval": 1,
   "interval_type": "weeks",
   "download": {
     "enabled": true,
