@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 from matplotlib import pyplot as plt
 from pandas import DataFrame
 from models.ml_model import Model
-from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from statsmodels.tsa.arima.model import ARIMA, ARIMAResults
 from utils import set_logging
@@ -36,12 +35,8 @@ class ArimaModel(Model):
         logger.info("Training complete.")
 
     def evaluate(self) -> None:
-        # forecast = self.model_fit.forecast(steps=len(self.test))
-        # forecast_errors = mean_squared_error(self.test[self.kpi], forecast)
         summary = self.model_fit.summary()
         logger.info(f"Summary: {summary}")
-
-        # logger.info("Mean Squared Forecast Error: {}".format(forecast_errors))
 
     def predict(self, model_name: str) -> None:
         if self.model_fit is None:

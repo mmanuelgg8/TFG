@@ -2,7 +2,6 @@ import logging
 from typing import Dict, List
 
 import pmdarima as pm
-import pandas as pd
 from dotenv import load_dotenv
 from matplotlib import pyplot as plt
 from models.ml_model import Model
@@ -38,7 +37,6 @@ class SarimaModel(Model):
         logger.info("Training complete.")
 
     def evaluate(self) -> None:
-        # predict = self.model_fit.predict(n_periods=len(self.test))
         predict = self.model_fit.predict_in_sample(self.train[self.kpi])
         logger.info("Predict: \n{}".format(predict))
         logger.info(f"Summary: {self.model_fit.summary()}")
