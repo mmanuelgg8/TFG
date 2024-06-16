@@ -36,10 +36,12 @@ class ArimaModel(Model):
         logger.info("Training complete.")
 
     def evaluate(self) -> None:
-        forecast = self.model_fit.forecast(steps=len(self.test))
-        forecast_errors = mean_squared_error(self.test[self.kpi], forecast)
+        # forecast = self.model_fit.forecast(steps=len(self.test))
+        # forecast_errors = mean_squared_error(self.test[self.kpi], forecast)
+        summary = self.model_fit.summary()
+        logger.info(f"Summary: {summary}")
 
-        logger.info("Mean Squared Forecast Error: {}".format(forecast_errors))
+        # logger.info("Mean Squared Forecast Error: {}".format(forecast_errors))
 
     def predict(self, model_name: str) -> None:
         if self.model_fit is None:

@@ -1,9 +1,8 @@
 {
   "name_id": "sierra_nevada_ndsi_monthly",
-  "date_interval": 1,
   "interval_type": "months",
   "download": {
-    "enabled": true,
+    "enabled": false,
     "url": "https://sh.dataspace.copernicus.eu/api/v1/process",
     "token_url": "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token",
     "client_id_env": "COPERNICUS_CLIENT_ID",
