@@ -13,7 +13,7 @@ Para usar la aplicación es necesario disponer de Docker activo en el sistema.
 Con el uso de `make` se puede desplegar la aplicación de forma sencilla.
 
 ```bash
-make run-image FILE"config.json"
+make run-image FILE="config.json"
 ```
 
 ## Bibliografía
