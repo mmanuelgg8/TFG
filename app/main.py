@@ -2,15 +2,15 @@ import argparse
 import json
 import logging
 import os
+import shutil
 from datetime import datetime
 from importlib import import_module
-import shutil
 
 import numpy as np
-from numpy.core.multiarray import ndarray
-from pandas import DataFrame
 from configuration.configuration import Configuration
 from dateutil.relativedelta import relativedelta
+from numpy.core.multiarray import ndarray
+from pandas import DataFrame
 from rasterio import rasterio
 from scripts.download import download
 from utils import set_logging
@@ -84,20 +84,26 @@ def main(config_file):
     ):
         logger.info("Training models...")
         start_date = datetime.strptime(train_config.get("start_date"), "%Y-%m-%d")
-        tiffs, time_values = tifs_to_array(name_id, start_date, parsed_date_interval, interval_type)
+        tiffs, time_values = tifs_to_array(
+            name_id, start_date, parsed_date_interval, interval_type
+        )
         data = []
         for tif in tiffs:
             with rasterio.open(tif) as src:
                 data.append(src.read())
 
         data = np.array(data)  # (image, bands, height, width)
-        data = data.reshape(data.shape[0], data.shape[2], data.shape[3])  # (image, height, width)
+        data = data.reshape(
+            data.shape[0], data.shape[2], data.shape[3]
+        )  # (image, height, width)
         logger.info("Data shape: {}".format(data[:, 0, 0]))
         normalized_data: ndarray = np.nan_to_num(data, nan=0, posinf=0, neginf=0) / 255
         df = create_dataframe(normalized_data, time_values, train_config.get("kpi"))
         logger.info("Dataframe: \n{}".format(df))
         model_params = train_config.get("model_params")
-        models = init_models(train_config.get("models"), df, train_config.get("kpi"), model_params)
+        models = init_models(
+            train_config.get("models"), df, train_config.get("kpi"), model_params
+        )
         if train_config.get("enabled"):
             for model in models:
                 model.train_model()
@@ -107,14 +113,18 @@ def main(config_file):
                     if not os.path.exists(models_path):
                         os.makedirs(models_path)
                         logger.info(f"Directory {models_path} created")
-                    model_path = os.path.join(models_path, f"{name_id}_{model.__class__.__name__}.sav")
+                    model_path = os.path.join(
+                        models_path, f"{name_id}_{model.__class__.__name__}.sav"
+                    )
                     model.save_model(model_path)
         if train_config.get("load_model"):
             models_path = str(configuration["models_path"])
             if not os.path.exists(models_path):
                 raise FileNotFoundError(f"Directory {models_path} not found")
             for model in models:
-                model_path = os.path.join(models_path, f"{name_id}_{model.__class__.__name__}.sav")
+                model_path = os.path.join(
+                    models_path, f"{name_id}_{model.__class__.__name__}.sav"
+                )
                 model.model_fit = model.load_model(model_path)
         if train_config.get("predict"):
             for model in models:
@@ -125,17 +135,25 @@ def main(config_file):
                 os.makedirs(visualizations_path)
                 logger.info(f"Directory {visualizations_path} created")
             for model in models:
-                visualization_path = os.path.join(visualizations_path, f"{name_id}_{model.__class__.__name__}.png")
+                visualization_path = os.path.join(
+                    visualizations_path, f"{name_id}_{model.__class__.__name__}.png"
+                )
                 if os.path.exists(visualization_path):
                     os.remove(visualization_path)
                     logger.info(f"File {visualization_path} removed")
-                model.save_visualization(visualization_path, name_id, config.get("interval_type"))
+                model.save_visualization(
+                    visualization_path, name_id, config.get("interval_type")
+                )
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Download and train models")
-    parser.add_argument("--config_file", "-c", type=str, help="Name of the JSON configuration file")
+    parser.add_argument(
+        "--config_file", "-c", type=str, help="Name of the JSON configuration file"
+    )
     args = parser.parse_args()
     logger.info("Using config file: " + args.config_file)
-    path = os.path.join(os.path.dirname(__file__), "..", "resources", "properties", args.config_file)
+    path = os.path.join(
+        os.path.dirname(__file__), "..", "resources", "properties", args.config_file
+    )
     main(path)

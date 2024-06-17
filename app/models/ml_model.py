@@ -1,6 +1,5 @@
 import logging
 
-# import pickle
 from typing import Any
 
 import joblib
@@ -15,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class Model:
 
-    def __init__(self, df: DataFrame, kpi):
+    def __init__(self, df: DataFrame, kpi: slice):
         self.df: DataFrame = df
         self.kpi: slice = kpi
         self.model_fit = None
