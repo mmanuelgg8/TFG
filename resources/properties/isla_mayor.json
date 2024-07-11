@@ -1,6 +1,5 @@
 {
   "name_id": "isla_mayor_ndvi_weekly",
-  "date_interval": 1,
   "interval_type": "weeks",
   "download": {
     "enabled": true,
@@ -10,8 +9,8 @@
     "client_id_env": "COPERNICUS_CLIENT_ID",
     "client_secret_env": "COPERNICUS_CLIENT_SECRET",
     "satellite_type": "sentinel-2-l2a",
-    "bbox": [15.959, 48.683, 16.002, 48.71],
-    "start_date": "2017-01-01",
+    "bbox": [-6.158491, 37.131489, -6.133836, 37.114921],
+    "start_date": "2015-01-01",
     "end_date": "2022-01-01",
     "format": "image/tiff",
     "evalscript": "ndvi",
@@ -27,7 +26,7 @@
     "start_date": "2015-01-01",
     "end_date": "2022-01-01",
     "kpi": "mean",
-    "models": ["sarima", "random_forest"],
+    "models": ["arima", "sarima", "random_forest"],
     "model_params": {
       "sarima": {
         "seasonal": true,

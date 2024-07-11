@@ -1,8 +1,10 @@
 import logging
+from typing import Dict, List
 
 from dotenv import load_dotenv
 from matplotlib import pyplot as plt
 from models.ml_model import Model
+from pandas import DataFrame
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
@@ -14,22 +16,23 @@ logger = logging.getLogger(__name__)
 
 
 class RandomForestModel(Model):
-    def __init__(self, df, kpi, model_params):
+    def __init__(self, df: DataFrame, kpi: slice, model_params: Dict = {}):
         super().__init__(df, kpi)
-        self.model_params = model_params
+        self.model_params: Dict = model_params
 
     def train_model(self) -> None:
         logger.info("Training {}...".format(self.__class__.__name__))
         self.train, self.test = train_test_split(self.df, test_size=0.2, shuffle=False)
-        self.train: list = self.train
+        self.train: List = self.train
+        self.test: List = self.test
         n_estimators = self.model_params.get("n_estimators", 100)
         max_depth = self.model_params.get("max_depth", None)
         model = RandomForestRegressor(n_estimators=n_estimators, max_depth=max_depth)
-        self.model_fit = model.fit(self.train, self.train[self.kpi])
+        self.model_fit: RandomForestRegressor = model.fit(self.train, self.train[self.kpi])
 
         logger.info("Training complete.")
 
-    def evaluate(self):
+    def evaluate(self) -> None:
         predictions = self.model_fit.predict(self.test)
         errors = mean_squared_error(self.test[self.kpi], predictions)
         score = self.model_fit.score(self.test, predictions)
@@ -55,12 +58,6 @@ class RandomForestModel(Model):
         self.train, self.test = train_test_split(self.df, test_size=0.2, shuffle=False)
         plt.plot(self.train[self.kpi], color="blue")
         plt.plot(self.test[self.kpi], color="orange")
-        # plt.scatter(
-        #     np.arange(len(self.train), len(self.train) + len(self.test)),
-        #     self.test[self.kpi],
-        #     color="orange",
-        #     marker="x",
-        # )
         prediction = self.model_fit.predict(self.test)
         plt.plot(range(len(self.train), len(self.train) + len(self.test)), prediction, color="green")
         future = self.model_fit.predict(self.df)

@@ -1,9 +1,8 @@
 {
-  "name_id": "sierra_nevada_ndsi_weekly",
-  "interval_type": "weeks",
+  "name_id": "ndsi_espectro",
+  "interval_type": "months",
   "download": {
     "enabled": true,
-    "remove_previous_download": true,
     "url": "https://sh.dataspace.copernicus.eu/api/v1/process",
     "token_url": "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token",
     "client_id_env": "COPERNICUS_CLIENT_ID",
@@ -13,33 +12,13 @@
       -3.4470127612104298, 37.08740963716705, -3.2866810661788666,
       37.01096018664316
     ],
-    "start_date": "2017-01-01",
+    "start_date": "2021-01-01",
     "end_date": "2022-01-01",
     "format": "image/tiff",
-    "evalscript": "ndsi",
+    "evalscript": "ndsi_espectro",
     "data_filter": {
       "maxCloudCoverage": 10,
       "minCloudCoverage": 0
-    }
-  },
-  "train": {
-    "enabled": true,
-    "save_visualization": true,
-    "save_model": true,
-    "start_date": "2015-01-01",
-    "end_date": "2022-01-01",
-    "kpi": "mean",
-    "models": ["sarima", "random_forest"],
-    "model_params": {
-      "sarima": {
-        "seasonal": true,
-        "stationary": false,
-        "m": 52
-      },
-      "random_forest": {
-        "n_estimators": 100,
-        "max_depth": 10
-      }
     }
   }
 }

@@ -2,7 +2,7 @@ import logging
 import os
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, Generator, Optional
+from typing import Any, Dict, Generator, List, Optional
 
 from configuration.configuration import Configuration
 from dateutil.relativedelta import relativedelta
@@ -53,14 +53,14 @@ class ImageFormatConstants(Enum):
 
 class Downloader:
 
-    def __init__(self, client_id, client_secret, token_url: Optional[str]):
+    def __init__(self, client_id: str, client_secret: str, token_url: Optional[str]):
         self.client_id: str = client_id
         self.client_secret: str = client_secret
         if token_url is None:
             token_url = UrlConstants.COPERNICUS_TOKEN.value
         self.token_url: str = token_url
 
-    def get_token(self, oauth, token_url: str) -> Dict[str, Any]:
+    def get_token(self, oauth: OAuth2Session, token_url: str) -> Dict[str, Any]:
         token = oauth.fetch_token(
             token_url=token_url,
             client_secret=self.client_secret,
@@ -77,7 +77,7 @@ class Downloader:
             raise e
         return oauth
 
-    def create_payload(self, bbox, data, format, evalscript) -> Dict[str, Any]:
+    def create_payload(self, bbox: List, data: List, format: str, evalscript: str) -> Dict[str, Any]:
         payload = {
             "input": {
                 "bounds": {"bbox": bbox},
