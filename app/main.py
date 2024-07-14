@@ -67,6 +67,7 @@ def main(config_file):
             end_date=end_date,
             date_interval=parsed_date_interval,
             name_id=name_id,
+            format=download_config.get("format"),
             url=download_config.get("url"),
             satellite_type=download_config.get("satellite_type"),
             data_filter=download_config.get("data_filter"),
