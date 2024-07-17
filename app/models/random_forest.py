@@ -28,7 +28,9 @@ class RandomForestModel(Model):
         n_estimators = self.model_params.get("n_estimators", 100)
         max_depth = self.model_params.get("max_depth", None)
         model = RandomForestRegressor(n_estimators=n_estimators, max_depth=max_depth)
-        self.model_fit: RandomForestRegressor = model.fit(self.train, self.train[self.kpi])
+        self.model_fit: RandomForestRegressor = model.fit(
+            self.train, self.train[self.kpi]
+        )
 
         logger.info("Training complete.")
 
@@ -59,9 +61,15 @@ class RandomForestModel(Model):
         plt.plot(self.train[self.kpi], color="blue")
         plt.plot(self.test[self.kpi], color="orange")
         prediction = self.model_fit.predict(self.test)
-        plt.plot(range(len(self.train), len(self.train) + len(self.test)), prediction, color="green")
+        plt.plot(
+            range(len(self.train), len(self.train) + len(self.test)),
+            prediction,
+            color="green",
+        )
         future = self.model_fit.predict(self.df)
-        plt.plot(range(len(self.df), len(self.df) + len(future)), future, color="purple")
+        plt.plot(
+            range(len(self.df), len(self.df) + len(future)), future, color="purple"
+        )
         plt.legend(["Training", "Test", "Prediction", "Future"])
         plt.title(f"{name_id} - Random Forest Model")
         plt.xlabel(f"Time ({interval_type})")

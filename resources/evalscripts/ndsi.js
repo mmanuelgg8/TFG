@@ -1,6 +1,4 @@
 //VERSION=3
-//Reference: https://earth.esa.int/web/sentinel/technical-guides/sentinel-2-msi/level-2a/algorithm
-
 function setup() {
   return {
     input: ["B03", "B11", "dataMask"],
